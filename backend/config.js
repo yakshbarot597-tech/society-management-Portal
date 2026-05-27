@@ -1,5 +1,6 @@
 const twilio = require("twilio");
 const path = require("path");
+const fs = require("fs");
 
 // Load environment variables from .env file
 require("dotenv").config({ path: path.join(__dirname, ".env") });
@@ -42,7 +43,9 @@ module.exports = {
         password: process.env.DB_PASSWORD || "Yaksh@1419",
         database: process.env.DB_NAME || "society_management",
         connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 10,
-        ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : null
+        ssl: process.env.DB_SSL === "true" ? {
+            ca: fs.readFileSync(path.join(__dirname, "ca.pem"))
+        } : null
     },
     twilio: {
         accountSid: process.env.TWILIO_ACCOUNT_SID || "",
