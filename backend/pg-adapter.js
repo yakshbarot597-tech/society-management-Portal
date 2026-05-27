@@ -144,29 +144,53 @@ class PgPoolWrapper {
         if (this.ensuringPromise) return this.ensuringPromise;
 
         this.ensuringPromise = (async () => {
-            // Connect to default 'postgres' database first to ensure target exists
-            const clientConfig = { ...this.config, database: 'postgres' };
-            const client = new Client(clientConfig);
-            try {
-                await client.connect();
-                const res = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [this.config.database]);
-                if (res.rowCount === 0) {
-                    console.log(`[PG Adapter] Database "${this.config.database}" does not exist. Creating...`);
-                    const dbNameEscaped = '"' + this.config.database.replace(/"/g, '""') + '"';
-                    await client.query(`CREATE DATABASE ${dbNameEscaped}`);
-                    console.log(`[PG Adapter] Database "${this.config.database}" created successfully.`);
-                }
-            } catch (err) {
-                console.warn(`[PG Adapter] Database exist check warning: ${err.message}`);
-            } finally {
+            const connectionString = process.env.DATABASE_URL;
+
+            if (connectionString) {
+                // Production environment (Render, etc.) - connect using connection string directly
+                console.log("[PG Adapter] Connecting via DATABASE_URL connection string...");
+                const pgConfig = {
+                    connectionString: connectionString,
+                    max: this.config.max,
+                    ssl: {
+                        rejectUnauthorized: false
+                    }
+                };
+                this.pool = new Pool(pgConfig);
+                this.ensured = true;
+            } else {
+                // Local development setup - check/create database
+                const clientConfig = { ...this.config, database: 'postgres' };
+                const client = new Client(clientConfig);
                 try {
-                    await client.end();
-                } catch (e) {}
+                    await client.connect();
+                    const res = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [this.config.database]);
+                    if (res.rowCount === 0) {
+                        console.log(`[PG Adapter] Database "${this.config.database}" does not exist. Creating...`);
+                        const dbNameEscaped = '"' + this.config.database.replace(/"/g, '""') + '"';
+                        await client.query(`CREATE DATABASE ${dbNameEscaped}`);
+                        console.log(`[PG Adapter] Database "${this.config.database}" created successfully.`);
+                    }
+                } catch (err) {
+                    console.warn(`[PG Adapter] Database exist check warning: ${err.message}`);
+                } finally {
+                    try {
+                        await client.end();
+                    } catch (e) {}
+                }
+
+                // Create actual connection pool
+                this.pool = new Pool(this.config);
+                this.ensured = true;
             }
 
-            // Create actual connection pool
-            this.pool = new Pool(this.config);
-            this.ensured = true;
+            // Register pool event listeners for both local and production
+            this.pool.on("connect", () => {
+                console.log("PostgreSQL connected successfully");
+            });
+            this.pool.on("error", (err) => {
+                console.error("PostgreSQL pool error:", err.message);
+            });
         })();
 
         return this.ensuringPromise;
