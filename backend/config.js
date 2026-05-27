@@ -39,6 +39,7 @@ module.exports = {
     apiKey: process.env.API_KEY || "hms-api-key-2024-secure", // Static API key for public data endpoints
     db: {
         host: process.env.DB_HOST || "localhost",
+        port: parseInt(process.env.DB_PORT) || 3306,
         user: process.env.DB_USER || "root",
         password: process.env.DB_PASSWORD || "Yaksh@1419",
         database: process.env.DB_NAME || "society_management",
@@ -47,11 +48,7 @@ module.exports = {
             const host = process.env.DB_HOST || "localhost";
             const isLocal = host === "localhost" || host === "127.0.0.1";
             if (process.env.DB_SSL === "true" || !isLocal) {
-                try {
-                    return { ca: fs.readFileSync(path.join(__dirname, "ca.pem")) };
-                } catch (e) {
-                    return { ca: fs.readFileSync("./ca.pem") };
-                }
+                return { rejectUnauthorized: false };
             }
             return null;
         })()

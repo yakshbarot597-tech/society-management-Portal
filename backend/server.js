@@ -21,6 +21,7 @@ const JWT_SECRET = config.jwtSecret || "super-secure-secret-key-123";
 // once the server or MySQL is restarted.
 const db = mysql.createPool({
     host: config.db.host,
+    port: config.db.port,
     user: config.db.user,
     password: config.db.password,
     database: config.db.database,
