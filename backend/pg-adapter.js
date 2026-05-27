@@ -146,8 +146,17 @@ class PgPoolWrapper {
         this.ensuringPromise = (async () => {
             const connectionString = process.env.DATABASE_URL;
 
+            // Log diagnostic environment keys and values to find typos
+            const dbEnvKeys = Object.keys(process.env).filter(k => 
+                k.includes('DB') || k.includes('DATABASE') || k.includes('PORT') || 
+                k.includes('HOST') || k.includes('SSL') || k.includes('PG')
+            );
+            console.log("[PG Adapter] Env keys related to DB:", dbEnvKeys);
+            if (process.env.DB_HOST) {
+                console.log("[PG Adapter] DB_HOST is set to:", process.env.DB_HOST);
+            }
+
             if (connectionString) {
-                // Production environment (Render, etc.) - connect using connection string directly
                 console.log("[PG Adapter] Connecting via DATABASE_URL connection string...");
                 
                 // Securely log the target host for troubleshooting getaddrinfo errors
@@ -168,6 +177,9 @@ class PgPoolWrapper {
                 this.pool = new Pool(pgConfig);
                 this.ensured = true;
             } else {
+                console.log("[PG Adapter] DATABASE_URL is NOT set. Falling back to host configuration...");
+                console.log("[PG Adapter] Connecting to host:", this.config.host, "database:", this.config.database);
+                
                 // Local development setup - check/create database
                 const clientConfig = { ...this.config, database: 'postgres' };
                 const client = new Client(clientConfig);
