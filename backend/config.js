@@ -39,8 +39,8 @@ module.exports = {
     apiKey: process.env.API_KEY || "hms-api-key-2024-secure", // Static API key for public data endpoints
     db: {
         host: process.env.DB_HOST || "localhost",
-        port: parseInt(process.env.DB_PORT) || 3306,
-        user: process.env.DB_USER || "root",
+        port: parseInt(process.env.DB_PORT) || 5432,
+        user: process.env.DB_USER || "postgres",
         password: process.env.DB_PASSWORD || "Yaksh@1419",
         database: process.env.DB_NAME || "society_management",
         connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 10,

@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
-const mysql = require("mysql2");
+const mysql = require("./pg-adapter");
 const bcryptjs = require("bcryptjs");
 const config = require("./config");
 const jwt = require("jsonwebtoken");
@@ -38,25 +38,25 @@ db.getConnection((err, connection) => {
     if (err) {
         console.log("Initial DB connection error:", err.message);
     } else {
-        console.log("MySQL Pool Connected");
+        console.log("PostgreSQL Pool Connected");
         connection.release();
     }
 });
 
-// Helper: wait for MySQL to be ready before running initDB
+// Helper: wait for PostgreSQL to be ready before running initDB
 // Retries every 2 seconds for up to 60 seconds
 function waitForDB(retriesLeft = 30) {
     db.getConnection((err, connection) => {
         if (err) {
             if (retriesLeft <= 0) {
-                console.error("Could not connect to MySQL after 60 seconds. Giving up.");
+                console.error("Could not connect to PostgreSQL after 60 seconds. Giving up.");
                 return;
             }
-            console.log(`MySQL not ready yet, retrying in 2s... (${retriesLeft} retries left)`);
+            console.log(`PostgreSQL not ready yet, retrying in 2s... (${retriesLeft} retries left)`);
             setTimeout(() => waitForDB(retriesLeft - 1), 2000);
         } else {
             connection.release();
-            console.log("MySQL is ready. Running database initialization...");
+            console.log("PostgreSQL is ready. Running database initialization...");
             initDB();
         }
     });
@@ -264,51 +264,43 @@ function parsePaidDate(dateStr) {
 const loadSchemaFromFile = async () => {
     const schemaPath = path.join(__dirname, "..", "database", "schema.sql");
     const sql = fs.readFileSync(schemaPath, "utf8");
-    const statements = sql
-        .split(";")
-        .map((s) => s.trim())
-        .filter(
-            (s) =>
-                s.length > 0 &&
-                !/^CREATE DATABASE/i.test(s) &&
-                !/^USE /i.test(s)
-        );
-
-    for (let stmt of statements) {
-        if (!/CREATE TABLE /i.test(stmt)) continue;
-        if (!/CREATE TABLE IF NOT EXISTS /i.test(stmt)) {
-            stmt = stmt.replace(/CREATE TABLE /i, "CREATE TABLE IF NOT EXISTS ");
+    try {
+        await db.promise().query(sql);
+    } catch (err) {
+        // Ignore relation / function / trigger already exists errors
+        if (!err.message.includes('already exists') && !err.message.includes('already a relation')) {
+            console.error("Error executing schema SQL:", err.message);
         }
-        await db.promise().query(stmt);
     }
 };
 
 // Keeps complaint APIs working (raw_flat_number / nullable unit_id) without changing schema.sql
 const ensureComplaintAppColumns = async () => {
     const [cols] = await db.promise().query(
-        `SELECT COLUMN_NAME, IS_NULLABLE
+        `SELECT column_name, is_nullable
          FROM INFORMATION_SCHEMA.COLUMNS
-         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'complaints'`
+         WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'complaints'`
     );
     if (cols.length === 0) return;
 
-    const colNames = cols.map((c) => c.COLUMN_NAME);
+    const colNames = cols.map((c) => (c.column_name || c.COLUMN_NAME || '').toLowerCase());
     if (!colNames.includes("raw_flat_number")) {
         await db.promise().query(
             "ALTER TABLE complaints ADD COLUMN raw_flat_number VARCHAR(50) NULL"
         );
     }
-    const unitCol = cols.find((c) => c.COLUMN_NAME === "unit_id");
-    if (unitCol && unitCol.IS_NULLABLE === "NO") {
+    const unitCol = cols.find((c) => (c.column_name || c.COLUMN_NAME || '').toLowerCase() === "unit_id");
+    const isNullable = unitCol ? (unitCol.is_nullable || unitCol.IS_NULLABLE || 'YES').toUpperCase() : 'YES';
+    if (unitCol && isNullable === "NO") {
         await db.promise().query(
-            "ALTER TABLE complaints MODIFY COLUMN unit_id BIGINT UNSIGNED NULL"
+            "ALTER TABLE complaints ALTER COLUMN unit_id DROP NOT NULL"
         );
     }
 };
 
 const renameTable = async (oldName, tempName) => {
     try {
-        await db.promise().query(`RENAME TABLE ${oldName} TO ${tempName}`);
+        await db.promise().query(`ALTER TABLE ${oldName} RENAME TO ${tempName}`);
         console.log(`Renamed table ${oldName} to ${tempName}`);
     } catch (e) {
         // Ignore if table doesn't exist
