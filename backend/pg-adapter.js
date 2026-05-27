@@ -149,6 +149,15 @@ class PgPoolWrapper {
             if (connectionString) {
                 // Production environment (Render, etc.) - connect using connection string directly
                 console.log("[PG Adapter] Connecting via DATABASE_URL connection string...");
+                
+                // Securely log the target host for troubleshooting getaddrinfo errors
+                try {
+                    const match = connectionString.match(/@([^/:]+)/);
+                    if (match && match[1]) {
+                        console.log("[PG Adapter] Target Database Host:", match[1]);
+                    }
+                } catch (e) {}
+
                 const pgConfig = {
                     connectionString: connectionString,
                     max: this.config.max,
