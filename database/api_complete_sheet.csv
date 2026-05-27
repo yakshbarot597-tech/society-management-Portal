@@ -1,0 +1,41 @@
+No,Category,HTTP Method,API Path,Frontend Function,Called From,Description
+1,Authentication & Login,GET,/api,N/A,N/A,Health check endpoint. Returns server port status and routes.
+2,Authentication & Login,POST,/api/setup,Api.setup(data),Setup form,Register/configure a new housing society with blocks flat layout and admin credentials.
+3,Authentication & Login,POST,/api/login,Api.login(data),attemptLogin(),Admin Login. Validates admin username and password. Returns society data and JWT token.
+4,Authentication & Login,POST,/api/resident-login,Api.residentLogin(data),attemptResidentLogin(),Resident Login. Validates resident username and password. Returns flat/block info and JWT token.
+5,Authentication & Login,GET,/api/societies,Api.getSocieties(),Landing page,Fetch all registered society names for the landing page dropdown.
+6,Password Reset OTP,POST,/api/request-resident-otp,Api.requestResidentOtp(data),Resident forgot password Step 1,Verifies society + flat + phone. Generates 6-digit OTP and sends it via Twilio SMS.
+7,Password Reset OTP,POST,/api/verify-resident-otp,Api.verifyResidentOtp(data),Resident forgot password Step 2,Validates OTP then updates resident username and/or password.
+8,Password Reset OTP,POST,/api/admin-verify-identity,Api.adminVerifyIdentity(data),Admin forgot password Step 1,Verifies admin username + Chairman phone. Sends OTP to Chairman via SMS.
+9,Password Reset OTP,POST,/api/admin-verify-otp,Api.adminVerifyOtp(data),Admin forgot password Step 2,Validates OTP sent to Chairman.
+10,Password Reset OTP,POST,/api/admin-reset-password,Api.adminResetPassword(data),Admin forgot password Step 3,Updates admin username and password after OTP verification.
+11,Flat & Maintenance,GET,/api/society/:name/:type,Api.getSociety(name type),loadDashboardData(),Fetch all society data: flats residents bank info notices expenses committee rules complaints.
+12,Flat & Maintenance,POST,/api/flat,Api.saveFlat(flatData),saveFlat() - Admin Edit Flat Form (script.js:1516),EDIT FLAT DETAILS FORM. Saves owner name phone tenant info resident credentials payment status plan and ownership transfer.
+13,Flat & Maintenance,POST,/api/flat,Api.saveFlat(updateData),markMaintenancePaid() - Quick Paid Button (script.js:2705),MARK AS PAID QUICK BUTTON. One-click marks a flat's current month maintenance as Paid with today's date.
+14,Expenses,POST,/api/expense,Api.saveExpense(data),Expense form,Add a new expense or update an existing one (title amount date notes).
+15,Expenses,DELETE,/api/expense/:id,Api.deleteExpense(id),Delete button on expense,Delete a specific expense record by ID.
+16,Notices,POST,/api/notice,Api.saveNotice(data),Notice form,Create or update a general society notice/announcement.
+17,Notices,DELETE,/api/notice/:id,Api.deleteNotice(id),Delete button on notice,Delete a specific notice by ID.
+18,Rules,POST,/api/rule,Api.saveRule(data),Rule form,Add or update a society rule (stored internally as a notice with _rule_ prefix).
+19,Rules,DELETE,/api/rule/:id,Api.deleteRule(id),Delete button on rule,Delete a specific society rule by ID.
+20,Complaints,POST,/api/complaint,Api.saveComplaint(data),Complaint form,Log a new complaint from a flat or ADMIN or update an existing complaint.
+21,Complaints,DELETE,/api/complaint/:id,Api.deleteComplaint(id),Delete button on complaint,Delete a specific complaint by ID.
+22,Committee,POST,/api/committee,Api.saveCommittee(data),Committee form,Register a new committee member (name role phone) for the society.
+23,Committee,DELETE,/api/committee/:id,Api.deleteCommittee(id),Delete button on committee,Remove a committee member by ID.
+24,Bank & Messaging,POST,/api/bank,Api.saveBank(data),Bank details form,Save or update bank details (bank name account number IFSC QR code image).
+25,Bank & Messaging,POST,/api/whatsapp-blast,N/A - Admin bulk action,WhatsApp blast button,Send bulk WhatsApp/SMS reminders to all residents via Twilio. Falls back to SMS if WhatsApp fails.
+26,Bank & Messaging,POST,/api/update-due-day,Api.updateDueDay(data),Due day settings,Update the society's default due day for monthly maintenance invoices.
+,,,,,,
+,,API KEYS & CONFIG (config.js),,,, 
+No,Section,Environment Variable,Default Value,,Description,
+1,Server,PORT,5000,,Port on which the Express server runs.,
+2,Security,JWT_SECRET,"super-secure-secret-key-123",,Secret key for signing and verifying JWT auth tokens. Must be changed in production.,
+3,Database,DB_HOST,"localhost",,MySQL database host address.,
+4,Database,DB_USER,"root",,MySQL database username.,
+5,Database,DB_PASSWORD,"Yaksh@1419",,MySQL database password.,
+6,Database,DB_NAME,"society_management",,MySQL database/schema name.,
+7,Database,DB_CONNECTION_LIMIT,10,,Maximum simultaneous database connections in the pool.,
+8,Database,DB_SSL,null,,Set to true in environment to enable SSL (rejectUnauthorized: true).,
+9,Twilio API,TWILIO_ACCOUNT_SID,(empty - simulated),,Twilio Account SID for accessing the Twilio API client.,
+10,Twilio API,TWILIO_AUTH_TOKEN,(empty - simulated),,Twilio Auth Token for authenticating the API client.,
+11,Twilio API,TWILIO_MESSAGING_SERVICE_SID,(empty - simulated),,Twilio Messaging Service SID used for sending SMS and WhatsApp messages.,

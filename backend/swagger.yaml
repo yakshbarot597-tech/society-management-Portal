@@ -1,0 +1,2380 @@
+openapi: 3.0.0
+info:
+  title: Housing Society Maintenance Portal API
+  version: 1.0.0
+  description: Housing Society Maintenance Portal API.
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+  - url: /
+    description: Relative proxy URL
+tags:
+  - name: Authentication & Setup
+    description: Managing society registration, admin setup, and logins
+  - name: Password Reset OTP
+    description: SMS-based password recovery workflows for both residents and admins
+  - name: Flat & Maintenance
+    description: Management of flats, occupancy details, and maintenance billing/payment history
+  - name: Expenses
+    description: Tracking and logging financial expenditures
+  - name: Notices
+    description: Society announcements and notice boards
+  - name: Rules
+    description: Managing internal society rules and guidelines
+  - name: Complaints
+    description: Residents logging grievances and admin management of issues
+  - name: Committee
+    description: Management of the society's governing committee
+  - name: Bank & Settings
+    description: Managing bank details, default billing configurations, and notifications
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Enter your JWT bearer token in the format `Bearer <token>` to authenticate requests.
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Static API key required to access the public society data endpoint. Use value `hms-api-key-2024-secure` (or whatever is set in config/env).
+
+  schemas:
+    SetupRequest:
+      type: object
+      required:
+        - society_name
+        - blocks
+        - flats
+        - username
+        - password
+      properties:
+        society_name:
+          type: string
+          example: "Greenwood Residency"
+          description: Unique name of the housing society.
+        blocks:
+          type: integer
+          example: 3
+          description: Total number of residential blocks (e.g. A, B, C).
+        flats:
+          oneOf:
+            - type: array
+              items:
+                type: integer
+              example: [12, 10, 15]
+              description: Array representing the number of flats in each corresponding block (e.g. [3, 3, 3] to have 3 flats in blocks A, B, and C).
+            - type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+              example:
+                A: ["11", "12", "13", "21", "22", "23", "31", "32", "33"]
+                B: ["11", "12", "13", "21", "22", "23", "31", "32", "33"]
+                C: ["11", "12", "13", "21", "22", "23", "31", "32", "33"]
+              description: Object mapping block names to lists of custom flat numbers. Useful for custom floor-based naming (like 11, 12, 13 for floor 1, etc.).
+        username:
+          type: string
+          example: "greenwood_admin"
+          description: Admin portal username.
+        password:
+          type: string
+          example: "SecurePass123"
+          description: Admin portal login password.
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          default: flat
+          example: "flat"
+          description: Type of residential properties in the society.
+        default_due_day:
+          type: integer
+          default: 1
+          example: 10
+          description: Default billing day of the month for maintenance invoices.
+
+    SetupResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        id:
+          type: integer
+          example: 1
+          description: Registered society database ID.
+
+    LoginRequest:
+      type: object
+      required:
+        - user
+        - pass
+      properties:
+        user:
+          type: string
+          example: "greenwood_admin"
+          description: Registered admin username.
+        pass:
+          type: string
+          example: "SecurePass123"
+          description: Admin login password.
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          default: flat
+          example: "flat"
+          description: Portal environment type.
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: JWT token for authorizing subsequent requests.
+        society:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            society_name:
+              type: string
+              example: "Greenwood Residency"
+            total_blocks:
+              type: integer
+              example: 3
+            total_units:
+              type: integer
+              example: 37
+            default_due_day:
+              type: integer
+              example: 10
+            property_type:
+              type: string
+              example: "flat"
+            blocks:
+              type: integer
+              example: 3
+            flats_per_block:
+              type: string
+              example: "[12, 10, 15]"
+            bank_name:
+              type: string
+              example: "State Bank of India"
+            bank_acc:
+              type: string
+              example: "12345678901"
+            bank_ifsc:
+              type: string
+              example: "SBIN0001234"
+            qr_code:
+              type: string
+              example: "data:image/png;base64,iVBORw0KGgo..."
+
+    ResidentLoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: "a101_john"
+          description: Registered resident username.
+        password:
+          type: string
+          example: "ResidentPass456"
+          description: Resident login password.
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          default: flat
+          example: "flat"
+          description: Portal environment type.
+
+    ResidentLoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: JWT token for authorizing subsequent requests.
+        society:
+          type: string
+          example: "Greenwood Residency"
+        property_type:
+          type: string
+          example: "flat"
+        block:
+          type: string
+          example: "A"
+        flat:
+          type: integer
+          example: 101
+
+    SocietyDataResponse:
+      type: object
+      properties:
+        config:
+          type: object
+          properties:
+            blocks:
+              type: integer
+              example: 3
+            flats:
+              type: array
+              items:
+                type: integer
+              example: [12, 10, 15]
+            user:
+              type: string
+              example: "greenwood_admin"
+            defaultDueDay:
+              type: integer
+              example: 10
+            propertyType:
+              type: string
+              example: "flat"
+        bank:
+          type: object
+          properties:
+            n:
+              type: string
+              example: "State Bank of India"
+              description: Bank Name
+            a:
+              type: string
+              example: "12345678901"
+              description: Account Number
+            i:
+              type: string
+              example: "SBIN0001234"
+              description: IFSC Code
+            q:
+              type: string
+              example: "data:image/png;base64,iVBORw..."
+              description: Base64 QR Code string
+        apartmentData:
+          type: object
+          description: Nested object mapping Blocks -> Flat Numbers -> Flat Details and Maintenance History
+          example:
+            A:
+              "101":
+                owner: "John Doe"
+                phone: "9876543210"
+                isRental: "No"
+                rentalName: ""
+                rentalPhone: ""
+                latestAmount: 1500
+                latestPaymentMethod: "UPI"
+                residentUsername: "john_doe_a101"
+                pastOwner: ""
+                pastPhone: ""
+                transferPeriod: null
+                months:
+                  "May-2026":
+                    status: "Paid"
+                    amount: 1500
+                    paidDate: "15/05/2026"
+                    plan: "monthly"
+                    paymentMethod: "UPI"
+                    owner: "John Doe"
+        notices:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 5
+              society_id:
+                type: integer
+                example: 1
+              title:
+                type: string
+                example: "Water Cut Announcement"
+              details:
+                type: string
+                example: "Water supply will be suspended on Saturday for maintenance."
+              date:
+                type: string
+                example: "20/05/2026"
+              updated_date:
+                type: string
+                nullable: true
+                example: null
+        expenses:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 2
+              society_id:
+                type: integer
+                example: 1
+              title:
+                type: string
+                example: "Elevator Service"
+              amount:
+                type: number
+                example: 4500
+              details:
+                type: string
+                example: "Monthly lift inspection and oiling."
+              period:
+                type: string
+                example: "May-2026"
+              year:
+                type: integer
+                example: 2026
+              date:
+                type: string
+                example: "12/05/2026"
+              updated_date:
+                type: string
+                nullable: true
+                example: null
+        committee:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 10
+              society_id:
+                type: integer
+                example: 1
+              name:
+                type: string
+                example: "Sarah Smith"
+              role:
+                type: string
+                example: "Secretary"
+              phone:
+                type: string
+                example: "9876543212"
+        rules:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 4
+              society_id:
+                type: integer
+                example: 1
+              title:
+                type: string
+                example: "No Loud Music After 10 PM"
+              details:
+                type: string
+                example: "As per society guidelines, quiet hours are enforced from 10:00 PM to 7:00 AM."
+              date:
+                type: string
+                example: "10/05/2026"
+              updated_date:
+                type: string
+                nullable: true
+                example: null
+        complaints:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 12
+              society_id:
+                type: integer
+                example: 1
+              title:
+                type: string
+                example: "Leakage in Lobby A"
+              flat:
+                type: string
+                example: "A-101"
+              details:
+                type: string
+                example: "Water dripping from ceiling in block A elevator lobby."
+              date:
+                type: string
+                example: "22/05/2026"
+              updated_date:
+                type: string
+                nullable: true
+                example: null
+              created_by:
+                type: string
+                example: "john_doe_a101"
+
+    FlatRequest:
+      type: object
+      required:
+        - society_name
+        - block
+        - flat_number
+      properties:
+        society_name:
+          type: string
+          example: "Greenwood Residency"
+        block:
+          type: string
+          example: "A"
+        flat_number:
+          type: integer
+          example: 101
+        owner:
+          type: string
+          example: "John Doe"
+        phone:
+          type: string
+          example: "9876543210"
+        isRental:
+          type: string
+          enum: ["Yes", "No"]
+          example: "No"
+        rentalName:
+          type: string
+          example: ""
+        rentalPhone:
+          type: string
+          example: ""
+        amount:
+          type: number
+          example: 1500
+          description: Maintenance amount.
+        period:
+          type: string
+          example: "May-2026"
+          description: Target maintenance billing period.
+        status:
+          type: string
+          enum: ["Paid", "Unpaid"]
+          example: "Paid"
+        plan:
+          type: string
+          example: "monthly"
+        paymentMethod:
+          type: string
+          enum: ["Cash", "UPI", "Bank Transfer", "Card", "Check"]
+          example: "UPI"
+        dateStr:
+          type: string
+          example: "22/05/2026"
+        futureOwner:
+          type: string
+          example: ""
+          description: Future owner name for unit ownership transfer.
+        futureOwnerPhone:
+          type: string
+          example: ""
+          description: Future owner phone for unit ownership transfer.
+        transferMonth:
+          type: string
+          example: ""
+          description: Month of ownership transfer (e.g. "May").
+        transferYear:
+          type: string
+          example: ""
+          description: Year of ownership transfer (e.g. "2026").
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          example: "flat"
+        residentUsername:
+          type: string
+          example: "john_doe_a101"
+          description: Credentials username for resident login.
+        residentPassword:
+          type: string
+          example: "ResidentPass456"
+          description: Credentials password for resident login.
+
+    ExpenseRequest:
+      type: object
+      required:
+        - society_name
+        - title
+        - amount
+        - date
+      properties:
+        id:
+          type: integer
+          nullable: true
+          example: null
+          description: ID of expense to update; omit or set to null/empty for adding a new expense.
+        society_name:
+          type: string
+          example: "Greenwood Residency"
+        title:
+          type: string
+          example: "Gardening Services"
+        amount:
+          type: number
+          example: 1200
+        details:
+          type: string
+          example: "Fertilizer purchase and lawn maintenance."
+        period:
+          type: string
+          example: "May-2026"
+        year:
+          type: integer
+          example: 2026
+        date:
+          type: string
+          example: "22/05/2026"
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          example: "flat"
+
+    NoticeRequest:
+      type: object
+      required:
+        - society_name
+        - title
+        - details
+        - date
+      properties:
+        id:
+          type: integer
+          nullable: true
+          example: null
+          description: ID of notice to update; omit or set to null/empty for adding a new notice.
+        society_name:
+          type: string
+          example: "Greenwood Residency"
+        title:
+          type: string
+          example: "Annual General Body Meeting"
+        details:
+          type: string
+          example: "Annual meeting scheduled at society clubhouse at 10 AM on 15th June."
+        date:
+          type: string
+          example: "22/05/2026"
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          example: "flat"
+
+    RuleRequest:
+      type: object
+      required:
+        - society_name
+        - title
+        - details
+        - date
+      properties:
+        id:
+          type: integer
+          nullable: true
+          example: null
+          description: ID of rule to update; omit or set to null/empty for adding a new rule.
+        society_name:
+          type: string
+          example: "Greenwood Residency"
+        title:
+          type: string
+          example: "No Pet Litter in Lobbies"
+          description: The rules title (system prepends `_rule_` automatically in DB).
+        details:
+          type: string
+          example: "Ensure pets litter outside society gates; clean up any accidental lobby residue."
+        date:
+          type: string
+          example: "22/05/2026"
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          example: "flat"
+
+    ComplaintRequest:
+      type: object
+      required:
+        - society_name
+        - title
+        - flat
+        - details
+        - date
+        - createdBy
+      properties:
+        id:
+          type: integer
+          nullable: true
+          example: null
+          description: ID of complaint to update; omit or set to null/empty for adding a new complaint.
+        society_name:
+          type: string
+          example: "Greenwood Residency"
+        title:
+          type: string
+          example: "Noisy Water Pumps"
+        flat:
+          type: string
+          example: "A-101"
+          description: Flat code, or "ADMIN" if logged by admin.
+        details:
+          type: string
+          example: "Water pump making loud vibrations throughout the evening."
+        date:
+          type: string
+          example: "22/05/2026"
+        createdBy:
+          type: integer
+          example: 2
+          description: Database ID of the user submitting the complaint.
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          example: "flat"
+
+    CommitteeRequest:
+      type: object
+      required:
+        - society_name
+        - name
+        - role
+        - phone
+      properties:
+        society_name:
+          type: string
+          example: "Greenwood Residency"
+        name:
+          type: string
+          example: "Sarah Smith"
+        role:
+          type: string
+          example: "Secretary"
+        phone:
+          type: string
+          example: "9876543212"
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          example: "flat"
+
+    BankRequest:
+      type: object
+      required:
+        - society_name
+        - bank_name
+        - bank_acc
+        - bank_ifsc
+      properties:
+        society_name:
+          type: string
+          example: "Greenwood Residency"
+        bank_name:
+          type: string
+          example: "State Bank of India"
+        bank_acc:
+          type: string
+          example: "12345678901"
+        bank_ifsc:
+          type: string
+          example: "SBIN0001234"
+        qr_code:
+          type: string
+          example: "data:image/png;base64,iVBORw..."
+          description: Base64 formatted string of the QR Code image.
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          example: "flat"
+
+    RequestOtpRequest:
+      type: object
+      required:
+        - society
+        - flat
+        - phone
+      properties:
+        society:
+          type: string
+          example: "Greenwood Residency"
+        flat:
+          type: string
+          example: "A-101"
+        phone:
+          type: string
+          example: "+919876543210"
+          description: Resident's registered mobile number.
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          example: "flat"
+
+    VerifyOtpRequest:
+      type: object
+      required:
+        - society
+        - flat
+        - phone
+        - otp
+        - newPassword
+      properties:
+        society:
+          type: string
+          example: "Greenwood Residency"
+        flat:
+          type: string
+          example: "A-101"
+        phone:
+          type: string
+          example: "+919876543210"
+        otp:
+          type: string
+          example: "123456"
+        newUsername:
+          type: string
+          example: "new_username"
+          description: Optional new resident login username.
+        newPassword:
+          type: string
+          example: "NewPass789!"
+          description: Newly chosen resident password.
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          example: "flat"
+
+    AdminVerifyIdentityRequest:
+      type: object
+      required:
+        - username
+        - chairmanPhone
+      properties:
+        username:
+          type: string
+          example: "greenwood_admin"
+        chairmanPhone:
+          type: string
+          example: "+919876543210"
+          description: Chairman's registered phone number for identity check.
+
+    AdminVerifyOtpRequest:
+      type: object
+      required:
+        - username
+        - chairmanPhone
+        - otp
+      properties:
+        username:
+          type: string
+          example: "greenwood_admin"
+        chairmanPhone:
+          type: string
+          example: "+919876543210"
+        otp:
+          type: string
+          example: "123456"
+
+    AdminResetPasswordRequest:
+      type: object
+      required:
+        - username
+        - chairmanPhone
+        - otp
+        - newPassword
+      properties:
+        username:
+          type: string
+          example: "greenwood_admin"
+        chairmanPhone:
+          type: string
+          example: "+919876543210"
+        otp:
+          type: string
+          example: "123456"
+        newUsername:
+          type: string
+          example: "greenwood_admin_new"
+          description: Optional new admin username.
+        newPassword:
+          type: string
+          example: "NewAdminPass1!"
+          description: Newly chosen admin password.
+
+    WhatsappBlastRequest:
+      type: object
+      required:
+        - residents
+        - message
+        - period
+      properties:
+        residents:
+          type: array
+          items:
+            type: object
+            required:
+              - owner_name
+              - phone
+              - flat
+              - amount
+            properties:
+              owner_name:
+                type: string
+                example: "John Doe"
+              phone:
+                type: string
+                example: "+919876543210"
+              flat:
+                type: string
+                example: "A-101"
+              amount:
+                type: number
+                example: 1500
+          description: List of resident units to send reminders to.
+        message:
+          type: string
+          example: "Hi *{name}*, this is a friendly reminder that your maintenance due for flat *{flat}* is *Rs.{amount}* for *{period}*."
+          description: Twilio SMS/WhatsApp template body. Supports placeholder strings.
+        period:
+          type: string
+          example: "May-2026"
+
+    UpdateDueDayRequest:
+      type: object
+      required:
+        - society_name
+        - default_due_day
+      properties:
+        society_name:
+          type: string
+          example: "Greenwood Residency"
+        default_due_day:
+          type: integer
+          example: 10
+        property_type:
+          type: string
+          enum: [flat, bungalow]
+          example: "flat"
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "An error occurred while processing the request."
+
+paths:
+
+  /api/society-flats/{name}/{type}:
+    get:
+      tags:
+        - Flat & Maintenance
+      summary: Get society flats and maintenance history (API Key protected)
+      description: |
+        Returns **config**, **apartmentData** (flats list), and **maintenance history** for the specified society.
+        No JWT token needed — authenticate using the `x-api-key` header instead.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Exact society name (URL-encoded if it contains spaces).
+          schema:
+            type: string
+            example: "Greenwood Residency"
+        - name: type
+          in: path
+          required: true
+          description: Property type of the society.
+          schema:
+            type: string
+            enum: [flat, bungalow]
+            example: "flat"
+      responses:
+        200:
+          description: Society flat configuration and invoice history returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  society:
+                    type: string
+                    example: "Greenwood Residency"
+                  property_type:
+                    type: string
+                    example: "flat"
+                  config:
+                    type: object
+                    properties:
+                      blocks:
+                        type: integer
+                        example: 3
+                      flats:
+                        type: array
+                        items:
+                          type: integer
+                        example: [12, 10, 15]
+                      user:
+                        type: string
+                        example: "greenwood_admin"
+                      defaultDueDay:
+                        type: integer
+                        example: 10
+                      propertyType:
+                        type: string
+                        example: "flat"
+                  apartmentData:
+                    type: object
+                    description: Nested object mapping Blocks -> Flat Numbers -> Flat Details and Maintenance History
+                    example:
+                      A:
+                        "101":
+                          owner: "John Doe"
+                          phone: "9876543210"
+                          isRental: "No"
+                          rentalName: ""
+                          rentalPhone: ""
+                          latestAmount: 1500
+                          latestPaymentMethod: "UPI"
+                          residentUsername: "john_doe_a101"
+                          pastOwner: ""
+                          pastPhone: ""
+                          transferPeriod: null
+                          months:
+                            "May-2026":
+                              status: "Paid"
+                              amount: 1500
+                              paidDate: "15/05/2026"
+                              plan: "monthly"
+                              paymentMethod: "UPI"
+                              owner: "John Doe"
+                  maintenance:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        flat_id:
+                          type: integer
+                          example: 101
+                        block:
+                          type: string
+                          example: "A"
+                        flat_number:
+                          type: integer
+                          example: 101
+                        period:
+                          type: string
+                          example: "May-2026"
+                        status:
+                          type: string
+                          example: "Paid"
+                        amount:
+                          type: number
+                          example: 1500
+                        paid_date:
+                          type: string
+                          example: "15-05-2026"
+                        plan:
+                          type: string
+                          example: "monthly"
+                        payment_method:
+                          type: string
+                          example: "UPI"
+                        owner_name:
+                          type: string
+                          example: "John Doe"
+        401:
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Invalid or missing API key."
+        404:
+          description: Society not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Server or database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/society-data/{name}/{type}:
+    get:
+      tags:
+        - Flat & Maintenance
+      summary: Get all society lists (API Key protected)
+      description: |
+        Returns **notices**, **rules**, **complaints**, and **expenses** for the specified society in a single request.
+        No JWT token needed — authenticate using the `x-api-key` header instead.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Exact society name (URL-encoded if it contains spaces).
+          schema:
+            type: string
+            example: "Greenwood Residency"
+        - name: type
+          in: path
+          required: true
+          description: Property type of the society.
+          schema:
+            type: string
+            enum: [flat, bungalow]
+            example: "flat"
+      responses:
+        200:
+          description: All four lists returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  society:
+                    type: string
+                    example: "Greenwood Residency"
+                  property_type:
+                    type: string
+                    example: "flat"
+                  notices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        society_id:
+                          type: integer
+                          example: 1
+                        title:
+                          type: string
+                          example: "Water Cut Announcement"
+                        details:
+                          type: string
+                          example: "Water supply suspended Saturday for maintenance."
+                        date:
+                          type: string
+                          example: "20-05-2026"
+                        updated_date:
+                          type: string
+                          nullable: true
+                          example: null
+                  rules:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        society_id:
+                          type: integer
+                          example: 1
+                        title:
+                          type: string
+                          example: "No Loud Music After 10 PM"
+                        details:
+                          type: string
+                          example: "Quiet hours enforced from 10 PM to 7 AM."
+                        date:
+                          type: string
+                          example: "10-05-2026"
+                        updated_date:
+                          type: string
+                          nullable: true
+                          example: null
+                  complaints:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 3
+                        society_id:
+                          type: integer
+                          example: 1
+                        title:
+                          type: string
+                          example: "Leakage in Lobby A"
+                        flat:
+                          type: string
+                          example: "A-101"
+                        details:
+                          type: string
+                          example: "Water dripping from ceiling in block A."
+                        date:
+                          type: string
+                          example: "22-05-2026"
+                        updated_date:
+                          type: string
+                          nullable: true
+                          example: null
+                        created_by:
+                          type: string
+                          example: "john_doe_a101"
+                  expenses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 4
+                        society_id:
+                          type: integer
+                          example: 1
+                        title:
+                          type: string
+                          example: "Elevator Service"
+                        amount:
+                          type: number
+                          example: 4500
+                        details:
+                          type: string
+                          example: "Monthly lift inspection."
+                        period:
+                          type: string
+                          example: "May-2026"
+                        year:
+                          type: integer
+                          example: 2026
+                        date:
+                          type: string
+                          example: "12-05-2026"
+                        updated_date:
+                          type: string
+                          nullable: true
+                          example: null
+        401:
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Invalid or missing API key."
+        404:
+          description: Society not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Server or database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/society-committee/{name}/{type}:
+    get:
+      tags:
+        - Committee
+      summary: Get committee members (API Key protected)
+      description: |
+        Returns all managing committee members for the specified society.
+        No JWT token needed — authenticate using the `x-api-key` header instead.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Exact society name (URL-encoded if it contains spaces).
+          schema:
+            type: string
+            example: "Greenwood Residency"
+        - name: type
+          in: path
+          required: true
+          description: Property type of the society.
+          schema:
+            type: string
+            enum: [flat, bungalow]
+            example: "flat"
+      responses:
+        200:
+          description: Committee members returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  society:
+                    type: string
+                    example: "Greenwood Residency"
+                  property_type:
+                    type: string
+                    example: "flat"
+                  committee:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 10
+                        society_id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: "Sarah Smith"
+                        role:
+                          type: string
+                          example: "Secretary"
+                        phone:
+                          type: string
+                          example: "9876543212"
+        401:
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Invalid or missing API key."
+        404:
+          description: Society not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Server or database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/society-bank/{name}/{type}:
+    get:
+      tags:
+        - Bank & Settings
+      summary: Get society bank details (API Key protected)
+      description: |
+        Returns the society bank details (bank name, account number, IFSC, and QR code) for the specified society.
+        No JWT token needed — authenticate using the `x-api-key` header instead.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Exact society name (URL-encoded if it contains spaces).
+          schema:
+            type: string
+            example: "Greenwood Residency"
+        - name: type
+          in: path
+          required: true
+          description: Property type of the society.
+          schema:
+            type: string
+            enum: [flat, bungalow]
+            example: "flat"
+      responses:
+        200:
+          description: Society bank details returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  society:
+                    type: string
+                    example: "Greenwood Residency"
+                  property_type:
+                    type: string
+                    example: "flat"
+                  bank:
+                    type: object
+                    properties:
+                      bank_name:
+                        type: string
+                        example: "State Bank of India"
+                      bank_acc:
+                        type: string
+                        example: "12345678901"
+                      bank_ifsc:
+                        type: string
+                        example: "SBIN0001234"
+                      qr_code:
+                        type: string
+                        example: "data:image/png;base64,iVBORw..."
+        401:
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Invalid or missing API key."
+        404:
+          description: Society not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Server or database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api:
+    get:
+      tags:
+        - Authentication & Setup
+      summary: Health check / Index
+      description: Returns the server port status and backend API routes validation metadata.
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  routes:
+                    type: array
+                    items:
+                      type: string
+                    example: ["GET /api", "POST /api/setup", "POST /api/login"]
+                  port:
+                    type: integer
+                    example: 5000
+
+  /api/setup:
+    post:
+      tags:
+        - Authentication & Setup
+      summary: Register / Setup Housing Society
+      description: Configures a new housing society with blocks, flat distributions, and the administrator credentials. Supports updating existing layouts on duplicate keys.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetupRequest'
+      responses:
+        200:
+          description: Society configured successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetupResponse'
+        500:
+          description: Database or Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/login:
+    post:
+      tags:
+        - Authentication & Setup
+      summary: Admin Login
+      description: Validates administrator portal credentials and returns full society data alongside a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        500:
+          description: Authentication failed or DB error
+
+  /api/resident-login:
+    post:
+      tags:
+        - Authentication & Setup
+      summary: Resident Login
+      description: Validates resident portal credentials and returns flat unit properties and a session JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResidentLoginRequest'
+      responses:
+        200:
+          description: Resident login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResidentLoginResponse'
+        500:
+          description: Database or server error
+
+  /api/societies:
+    get:
+      tags:
+        - Flat & Maintenance
+      summary: Fetch Registered Societies
+      description: Retrieves a list of all registered housing societies. Used on the landing page dropdown.
+      responses:
+        200:
+          description: List of society names
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: ["Greenwood Residency", "Royal Palms"]
+
+  /api/request-resident-otp:
+    post:
+      tags:
+        - Password Reset OTP
+      summary: Resident Forgot Password - Step 1
+      description: Validates unit numbers and phone, generates a 6-digit SMS OTP, and delivers it via Twilio.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestOtpRequest'
+      responses:
+        200:
+          description: OTP generated and sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/verify-resident-otp:
+    post:
+      tags:
+        - Password Reset OTP
+      summary: Resident Forgot Password - Step 2
+      description: Validates the SMS OTP, then updates the resident's portal username and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOtpRequest'
+      responses:
+        200:
+          description: Password reset completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/admin-verify-identity:
+    post:
+      tags:
+        - Password Reset OTP
+      summary: Admin Forgot Password - Step 1
+      description: Verifies the admin username and matching Chairman phone number, then sends a Twilio SMS OTP to the Chairman.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminVerifyIdentityRequest'
+      responses:
+        200:
+          description: Identity verified; OTP sent to Chairman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/admin-verify-otp:
+    post:
+      tags:
+        - Password Reset OTP
+      summary: Admin Forgot Password - Step 2
+      description: Validates the SMS OTP sent to the Chairman's phone.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminVerifyOtpRequest'
+      responses:
+        200:
+          description: OTP verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/admin-reset-password:
+    post:
+      tags:
+        - Password Reset OTP
+      summary: Admin Forgot Password - Step 3
+      description: Finalizes admin recovery by updating the username and password details after verified OTP status.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminResetPasswordRequest'
+      responses:
+        200:
+          description: Admin credentials updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/society/{name}/{type}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Flat & Maintenance
+      summary: Fetch Society Dashboard Data
+      description: Retrieves complete dashboard datasets for a specific society. Returns configurations, banking, complaints, rules, committee roster, notices, and financial expenditures.
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: The society name
+          schema:
+            type: string
+            example: "Greenwood Residency"
+        - name: type
+          in: path
+          required: true
+          description: Property environment type (e.g. flat or bungalow)
+          schema:
+            type: string
+            example: "flat"
+      responses:
+        200:
+          description: Complete society dataset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocietyDataResponse'
+        404:
+          description: Society not found
+
+  /api/flat:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Flat & Maintenance
+      summary: Fetch Flat Details
+      description: Retrieves the current details of a specific flat by its society, block, and flat number.
+      parameters:
+        - name: society_name
+          in: query
+          required: true
+          description: Name of the housing society
+          schema:
+            type: string
+            example: "Greenwood Residency"
+        - name: block
+          in: query
+          required: true
+          description: Block name (e.g. A, B, C)
+          schema:
+            type: string
+            example: "A"
+        - name: flat_number
+          in: query
+          required: true
+          description: Flat/Unit number
+          schema:
+            type: integer
+            example: 101
+        - name: property_type
+          in: query
+          required: false
+          description: Property type of the society (flat or bungalow)
+          schema:
+            type: string
+            enum: [flat, bungalow]
+            default: flat
+            example: "flat"
+      responses:
+        200:
+          description: Flat details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlatRequest'
+        400:
+          description: Missing required query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Society or Flat not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Server or database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Flat & Maintenance
+      summary: Create / Update Flat Details
+      description: |
+        Used for two primary frontend dashboard workflows:
+        1. **Edit Flat Details Form**: Updates names, phones, tenancy status, billing accounts, and coordinates ownership transfer.
+        2. **Mark Maintenance Paid Button**: Performs a quick one-click status transition, marking a selected month maintenance as paid on the current date.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlatRequest'
+      responses:
+        200:
+          description: Flat records updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/expense:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Expenses
+      summary: Get Society Expenses
+      description: Returns all financial expenditures for a given society.
+      parameters:
+        - name: society_name
+          in: query
+          required: true
+          description: Name of the housing society
+          schema:
+            type: string
+            example: "Greenwood Residency"
+        - name: property_type
+          in: query
+          required: false
+          description: Property type of the society (flat or bungalow)
+          schema:
+            type: string
+            enum: [flat, bungalow]
+            default: flat
+            example: "flat"
+      responses:
+        200:
+          description: A list of society expenses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  expenses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        society_id:
+                          type: integer
+                        title:
+                          type: string
+                        amount:
+                          type: number
+                        details:
+                          type: string
+                        period:
+                          type: string
+                        year:
+                          type: integer
+                        date:
+                          type: string
+                        updated_date:
+                          type: string
+                          nullable: true
+        400:
+          description: Missing required query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Society not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Server or database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Expenses
+      summary: Create / Update Expense
+      description: Registers a new expense or updates an existing financial ledger record.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseRequest'
+      responses:
+        200:
+          description: Expense transaction saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/expense/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Expenses
+      summary: Delete Expense
+      description: Permanently removes a financial expense ledger transaction by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Database ID of the expense transaction
+          schema:
+            type: integer
+            example: 2
+      responses:
+        200:
+          description: Expense transaction deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/notice:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Notices
+      summary: Get Society Notices
+      description: Returns all notices for a given society (excluding internal rules).
+      parameters:
+        - name: society_name
+          in: query
+          required: true
+          description: Name of the housing society
+          schema:
+            type: string
+            example: "Greenwood Residency"
+        - name: property_type
+          in: query
+          required: false
+          description: Property type of the society (flat or bungalow)
+          schema:
+            type: string
+            enum: [flat, bungalow]
+            default: flat
+            example: "flat"
+      responses:
+        200:
+          description: A list of society notices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  notices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        society_id:
+                          type: integer
+                        title:
+                          type: string
+                        details:
+                          type: string
+                        date:
+                          type: string
+        400:
+          description: Missing required query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Society not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Server or database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Notices
+      summary: Create / Update Notice
+      description: Publishes a new society announcement or modifies an existing notices item.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoticeRequest'
+      responses:
+        200:
+          description: Announcement published successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/notice/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Notices
+      summary: Delete Notice
+      description: Removes a general announcement notice by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Database ID of the notice
+          schema:
+            type: integer
+            example: 5
+      responses:
+        200:
+          description: Announcement deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/rule:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Rules
+      summary: Get Society Rules
+      description: Returns all internal rules and regulations for a given society.
+      parameters:
+        - name: society_name
+          in: query
+          required: true
+          description: Name of the housing society
+          schema:
+            type: string
+            example: "Greenwood Residency"
+        - name: property_type
+          in: query
+          required: false
+          description: Property type of the society (flat or bungalow)
+          schema:
+            type: string
+            enum: [flat, bungalow]
+            default: flat
+            example: "flat"
+      responses:
+        200:
+          description: A list of society rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  rules:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        society_id:
+                          type: integer
+                        title:
+                          type: string
+                        details:
+                          type: string
+                        date:
+                          type: string
+        400:
+          description: Missing required query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Society not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Server or database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Rules
+      summary: Create / Update Rule
+      description: Publishes or edits society rules and guidelines. Internally maps to a notice with `_rule_` prefix prepended to the title in the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleRequest'
+      responses:
+        200:
+          description: Guideline published successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/rule/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Rules
+      summary: Delete Rule
+      description: Removes a society guideline rule by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Database ID of the rule notice
+          schema:
+            type: integer
+            example: 4
+      responses:
+        200:
+          description: Guideline deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/complaint:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Complaints
+      summary: Get Society Complaints
+      description: Returns all complaints for a given society.
+      parameters:
+        - name: society_name
+          in: query
+          required: true
+          description: Name of the housing society
+          schema:
+            type: string
+            example: "Greenwood Residency"
+        - name: property_type
+          in: query
+          required: false
+          description: Property type of the society (flat or bungalow)
+          schema:
+            type: string
+            enum: [flat, bungalow]
+            default: flat
+            example: "flat"
+      responses:
+        200:
+          description: A list of complaints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  complaints:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        society_id:
+                          type: integer
+                        title:
+                          type: string
+                        flat:
+                          type: string
+                        details:
+                          type: string
+                        date:
+                          type: string
+                        createdBy:
+                          type: string
+        400:
+          description: Missing required query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Society not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Server or database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Complaints
+      summary: Log / Update Complaint
+      description: Registers a resident grievance or updates administrative feedback status.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplaintRequest'
+      responses:
+        200:
+          description: Complaint ticket updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/complaint/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Complaints
+      summary: Delete Complaint Ticket
+      description: Deletes a logged resident complaint ticket by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Database ID of the complaint ticket
+          schema:
+            type: integer
+            example: 12
+      responses:
+        200:
+          description: Complaint ticket removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/committee:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Committee
+      summary: Get Society Committee Members
+      description: Returns all committee members for a given society.
+      parameters:
+        - name: society_name
+          in: query
+          required: true
+          description: Name of the housing society
+          schema:
+            type: string
+            example: "Greenwood Residency"
+        - name: property_type
+          in: query
+          required: false
+          description: Property type of the society (flat or bungalow)
+          schema:
+            type: string
+            enum: [flat, bungalow]
+            default: flat
+            example: "flat"
+      responses:
+        200:
+          description: A list of committee members
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  committee:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        society_id:
+                          type: integer
+                        name:
+                          type: string
+                        role:
+                          type: string
+                        phone:
+                          type: string
+        400:
+          description: Missing required query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Society not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Server or database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Committee
+      summary: Add / Update Committee Member
+      description: Configures managing committee rosters (roles, mobile numbers) for society administration.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommitteeRequest'
+      responses:
+        200:
+          description: Managing member added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/committee/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Committee
+      summary: Remove Committee Member
+      description: Deletes a committee member registry entry from the society's users list.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Database ID of the committee user
+          schema:
+            type: integer
+            example: 10
+      responses:
+        200:
+          description: Managing member removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/bank:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Bank & Settings
+      summary: Save Bank Details
+      description: Saves or updates the society's official bank account details and QR code image for payment processing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankRequest'
+      responses:
+        200:
+          description: Banking information updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/whatsapp-blast:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Bank & Settings
+      summary: Send SMS / WhatsApp Broadcast Reminders
+      description: Triggers a bulk notification campaign via Twilio. Reverts to SMS delivery if the WhatsApp pipeline fails.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhatsappBlastRequest'
+      responses:
+        200:
+          description: Campaign finished processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/update-due-day:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Bank & Settings
+      summary: Configure Invoice Due Day
+      description: Explicitly configures the monthly due date threshold for society invoice notifications.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDueDayRequest'
+      responses:
+        200:
+          description: Invoice billing day updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'

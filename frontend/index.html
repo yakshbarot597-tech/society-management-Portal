@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Society Management Pro - Skyline Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- ============================================================
+         LANDING INTERFACE: Property Type Selection (FIRST SCREEN)
+    ============================================================= -->
+    <div id="landingInterface" class="min-h-screen flex items-center justify-center p-6">
+
+        <div class="card-bg p-14 rounded-[44px] shadow-2xl w-full max-w-2xl text-center">
+
+            <!-- Icon & Title -->
+            <div style="
+                width:90px; height:90px;
+                background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                border-radius:28px;
+                display:flex; align-items:center; justify-content:center;
+                margin:0 auto 28px;
+                box-shadow:0 12px 32px rgba(139,94,60,0.32);
+            ">
+                <span style="font-size:44px;">🏘️</span>
+            </div>
+
+            <h1 style="
+                font-size:52px;
+                font-weight:900;
+                color:#3E2C1C;
+                margin-bottom:10px;
+                letter-spacing:0.5px;
+                line-height:1.15;
+            ">Welcome to<br><span style="color:#8B5E3C;">Society Manager</span></h1>
+
+            <p style="
+                font-size:26px;
+                font-weight:700;
+                color:#7A6855;
+                margin-bottom:44px;
+                margin-top:14px;
+            ">Select your property type to get started</p>
+
+            <!-- Property Type Cards -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-bottom:36px;">
+
+                <!-- FLAT Card -->
+                <button onclick="selectPropertyType('flat')" id="flatCard" style="
+                    background: rgba(255,255,255,0.92);
+                    border: 2.5px solid rgba(139,94,60,0.18);
+                    border-radius:28px;
+                    padding: 36px 20px;
+                    cursor:pointer;
+                    transition: all 0.25s ease;
+                    box-shadow: 0 6px 24px rgba(139,94,60,0.10);
+                    display:flex; flex-direction:column; align-items:center; gap:14px;
+                    position:relative; overflow:hidden;
+                " onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 18px 40px rgba(139,94,60,0.22)'; this.style.borderColor='#8B5E3C';"
+                    onmouseout="this.style.transform=''; this.style.boxShadow='0 6px 24px rgba(139,94,60,0.10)'; this.style.borderColor='rgba(139,94,60,0.18)';">
+                    <div style="
+                        width:80px; height:80px;
+                        background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                        border-radius:22px;
+                        display:flex; align-items:center; justify-content:center;
+                        box-shadow:0 8px 20px rgba(139,94,60,0.28);
+                        font-size:38px;
+                    ">🏢</div>
+                    <span style="
+                        font-size:32px;
+                        font-weight:900;
+                        color:#3E2C1C;
+                        letter-spacing:0.5px;
+                    ">Flat</span>
+                    <span style="
+                        font-size:18px;
+                        font-weight:700;
+                        color:#7A6855;
+                        line-height:1.4;
+                    ">Apartments &amp;<br>Multi-storey buildings</span>
+                </button>
+
+                <!-- BUNGALOW Card -->
+                <button onclick="selectPropertyType('bungalow')" id="bungalowCard" style="
+                    background: rgba(255,255,255,0.92);
+                    border: 2.5px solid rgba(139,94,60,0.18);
+                    border-radius:28px;
+                    padding: 36px 20px;
+                    cursor:pointer;
+                    transition: all 0.25s ease;
+                    box-shadow: 0 6px 24px rgba(139,94,60,0.10);
+                    display:flex; flex-direction:column; align-items:center; gap:14px;
+                    position:relative; overflow:hidden;
+                " onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 18px 40px rgba(139,94,60,0.22)'; this.style.borderColor='#8B5E3C';"
+                    onmouseout="this.style.transform=''; this.style.boxShadow='0 6px 24px rgba(139,94,60,0.10)'; this.style.borderColor='rgba(139,94,60,0.18)';">
+                    <div style="
+                        width:80px; height:80px;
+                        background:linear-gradient(135deg,#5B8C3C,#7DB55A);
+                        border-radius:22px;
+                        display:flex; align-items:center; justify-content:center;
+                        box-shadow:0 8px 20px rgba(91,140,60,0.28);
+                        font-size:38px;
+                    ">🏡</div>
+                    <span style="
+                        font-size:32px;
+                        font-weight:900;
+                        color:#3E2C1C;
+                        letter-spacing:0.5px;
+                    ">Bungalow</span>
+                    <span style="
+                        font-size:18px;
+                        font-weight:700;
+                        color:#7A6855;
+                        line-height:1.4;
+                    ">Villas &amp;<br>Independent houses</span>
+                </button>
+
+            </div>
+
+            <!-- Tagline -->
+            <p style="
+                font-size:19px;
+                font-weight:700;
+                color:#B0998A;
+                margin-top:8px;
+            ">⚡ Powered by Society Management Pro</p>
+
+        </div>
+
+    </div>
+
+    <div id="setupInterface" class="hidden min-h-screen flex items-center justify-center p-6">
+
+
+        <div class="card-bg p-12 rounded-[40px] shadow-2xl w-full max-w-4xl">
+
+            <h2 style="
+            font-size:58px;
+            font-weight:900;
+            color:#8B5E3C;
+            margin-bottom:28px;
+            letter-spacing:1px;
+        ">
+                Society Portal
+            </h2>
+
+            <div class="space-y-6">
+
+                <input id="setupSocietyName" type="text" maxlength="40" placeholder="Society Name" style="
+                    width:100%;
+                    height:92px;
+                    padding:24px 28px;
+                    border-radius:24px;
+                    font-size:34px;
+                    font-weight:700;
+                " class="input-field">
+
+                <div id="configFields" class="space-y-6">
+
+                    <div class="grid grid-cols-1 gap-5">
+                        <input id="setupBlocks" type="number" min="1" max="99" oninput="
+                            if(this.value.length > 2) this.value = this.value.slice(0,2);
+                            if(typeof generateFlatInputs === 'function') generateFlatInputs(this.value);
+                        " placeholder="Number of Blocks" style="
+                            width:100%;
+                            height:92px;
+                            padding:24px 28px;
+                            border-radius:24px;
+                            font-size:34px;
+                            font-weight:700;
+                        " class="input-field">
+                    </div>
+
+                    <!-- Same Flats For All Blocks Toggle -->
+                    <div id="sameFlatsToggleRow" class="hidden" style="
+                        display:none;
+                        flex-wrap:wrap;
+                        align-items:center;
+                        gap:18px;
+                        background:rgba(139,94,60,0.07);
+                        border:2px solid rgba(139,94,60,0.18);
+                        border-radius:20px;
+                        padding:20px 28px;
+                    ">
+                        <label style="display:flex;align-items:center;gap:14px;cursor:pointer;flex:1;min-width:250px;">
+                            <div style="position:relative;width:56px;height:30px;flex-shrink:0;">
+                                <input type="checkbox" id="sameFlatsCheck" onchange="toggleSameFlats()"
+                                    style="opacity:0;width:0;height:0;position:absolute;">
+                                <span id="sameFlatsTrack" style="
+                                    position:absolute;inset:0;
+                                    background:#D9C3AE;
+                                    border-radius:999px;
+                                    transition:0.25s;
+                                    cursor:pointer;
+                                "></span>
+                                <span id="sameFlatsThumb" style="
+                                    position:absolute;
+                                    left:4px;top:4px;
+                                    width:22px;height:22px;
+                                    background:white;
+                                    border-radius:50%;
+                                    transition:0.25s;
+                                    box-shadow:0 2px 6px rgba(0,0,0,0.18);
+                                "></span>
+                            </div>
+                            <span id="sameFlatsLabel" style="font-size:24px;font-weight:800;color:#5B3A29;">Same flats
+                                in all blocks</span>
+                        </label>
+                        <div id="globalFlatsInputs" style="display:none; gap:10px; width:100%;">
+                            <!-- Populated by JS based on property type -->
+                        </div>
+                    </div>
+
+                    <div id="dynamicFlatsContainer" class="grid grid-cols-2 gap-5">
+                        <!-- Dynamically populated by JS based on blocks -->
+                    </div>
+
+                    <input id="setupUser" type="text" maxlength="20" placeholder="Admin Username" style="
+                        width:100%;
+                        height:92px;
+                        padding:24px 28px;
+                        border-radius:24px;
+                        font-size:34px;
+                        font-weight:700;
+                    " class="input-field">
+
+                    <input id="setupPass" type="password" maxlength="20" placeholder="Admin Password" style="
+                        width:100%;
+                        height:92px;
+                        padding:24px 28px;
+                        border-radius:24px;
+                        font-size:34px;
+                        font-weight:700;
+                    " class="input-field">
+
+                </div>
+
+                <button onclick="runSetup()" style="
+        width:100%;
+        height:110px;
+
+        border:none;
+
+        border-radius:26px;
+
+        background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+
+        color:white;
+
+        font-size:42px;
+
+        font-weight:900;
+
+        letter-spacing:1.5px;
+
+        margin-top:16px;
+
+        cursor:pointer;
+
+        box-shadow:
+            0 14px 32px rgba(139,94,60,0.28);
+
+        transition:0.25s;
+    ">
+                    Initialize Society
+                </button>
+
+                <button onclick="toggleResidentLogin()" style="
+        width:90%;
+
+        background:none;
+
+        border:none;
+
+        color:#8B5E3C;
+
+        font-size:34px;
+
+        font-weight:900;
+
+        margin-top:18px;
+
+        cursor:pointer;
+    ">
+                    Resident Login
+                </button>
+                <p style="
+    text-align:center;
+    font-size:38px;
+    color:#7A6855;
+    margin-top:18px;
+">
+                    Admin exists?
+
+                    <button onclick="toggleLoginMode()" style="
+        background:none;
+        border:none;
+        color:#8B5E3C;
+        font-size:30px;
+        font-weight:900;
+        cursor:pointer;
+    ">
+                        Admin Login
+                    </button>
+                </p>
+
+                <button onclick="showLanding()" style="
+                    width:100%;
+                    background:none;
+                    border:none;
+                    color:#7A6855;
+                    font-size:30px;
+                    font-weight:900;
+                    margin-top:14px;
+                    cursor:pointer;
+                ">
+                    Back to Selection
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div id="residentInterface" class="hidden min-h-screen flex items-center justify-center p-6">
+
+        <div class="card-bg w-full max-w-2xl p-12 rounded-[40px] shadow-2xl">
+
+            <!-- Heading -->
+            <h2 style="
+            font-size:58px;
+            font-weight:900;
+            color:#8B5E3C;
+            margin-bottom:34px;
+            text-align:center;
+            letter-spacing:1px;
+        ">
+                Resident Login
+            </h2>
+
+            <!-- Form -->
+            <div class="space-y-6">
+
+                <!-- Username -->
+                <input id="resLoginUsername" type="text" maxlength="40" placeholder="Resident Username" autocomplete="off"
+                    class="input-field" style="
+                    width:100%;
+                    height:92px;
+                    padding:24px 28px;
+                    border-radius:24px;
+                    font-size:34px;
+                    font-weight:700;
+                ">
+
+                <input id="resPassword" type="password" maxlength="20" placeholder="Password"
+                    autocomplete="new-password" class="input-field" style="
+    width:100%;
+    height:92px;
+    padding:24px 28px;
+    border-radius:24px;
+    font-size:34px;
+    font-weight:700;
+">
+                <!-- Login Button -->
+                <button onclick="attemptResidentLogin()" style="
+                    width:100%;
+                    height:110px;
+                    border:none;
+                    border-radius:26px;
+                    background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                    color:white;
+                    font-size:42px;
+                    font-weight:900;
+                    letter-spacing:1.5px;
+                    margin-top:16px;
+                    cursor:pointer;
+                    box-shadow:
+                        0 14px 32px rgba(139,94,60,0.28);
+                ">
+                    Verify & Enter
+                </button>
+                <button onclick="forgotResidentPassword()" style="
+    width:100%;
+    background:none;
+    border:none;
+    color:#8B5E3C;
+    font-size:30px;
+    font-weight:900;
+    margin-top:16px;
+    cursor:pointer;
+">
+                    Forgot Password?
+                </button>
+                <!-- Back -->
+                <button onclick="toggleResidentLogin()" style="
+                    width:100%;
+                    background:none;
+                    border:none;
+                    color:#8B5E3C;
+                    font-size:34px;
+                    font-weight:900;
+                    margin-top:18px;
+                    cursor:pointer;
+                ">
+                    Back
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="loginInterface" class="hidden min-h-screen flex items-center justify-center p-6">
+
+        <div class="card-bg p-12 rounded-[50px] shadow-2xl w-full max-w-2xl text-center">
+
+            <h2 style="
+            font-size:64px;
+            font-weight:900;
+            color:#3E2C1C;
+            margin-bottom:40px;
+        ">
+                Admin Login
+            </h2>
+
+            <div class="space-y-6">
+                <input id="loginUser" type="text" maxlength="20" placeholder="Username" autocomplete="off"
+                    class="input-field w-full" style="
+                    height:92px;
+                    padding:24px 28px;
+                    border-radius:24px;
+                    font-size:34px;
+                    font-weight:700;
+                ">
+
+                <input id="loginPass" type="password" maxlength="20" placeholder="Password" autocomplete="new-password"
+                    class="input-field w-full" style="
+                    height:92px;
+                    padding:24px 28px;
+                    border-radius:24px;
+                    font-size:34px;
+                    font-weight:700;
+                ">
+
+                <!-- Inline error message for admin login -->
+                <p id="loginErr"
+                    style="color:#DC2626;font-size:22px;font-weight:700;display:none;text-align:center;margin-top:4px;">
+                </p>
+
+                <button onclick="attemptLogin()" style="
+                    width:100%;
+                    height:100px;
+                    border:none;
+                    border-radius:24px;
+                    background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                    color:white;
+                    font-size:40px;
+                    font-weight:900;
+                    cursor:pointer;
+                    margin-top:14px;
+                    box-shadow:0 14px 32px rgba(139,94,60,0.28);
+                ">
+                    Access Dashboard
+                </button>
+
+                <p style="text-align:center; margin-top:16px;">
+                    <a href="#" onclick="forgotAdminPassword(); return false;"
+                        style="color:#8B5E3C; font-size:30px; font-weight:900; text-decoration:underline;">Forgot Admin
+                        Password?</a>
+                </p>
+
+                <button onclick="backToSetup()" style="
+                    width:100%;
+                    background:none;
+                    border:none;
+                    color:#7A6855;
+                    font-size:34px;
+                    font-weight:900;
+                    margin-top:18px;
+                    cursor:pointer;
+                ">
+                    Back
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="dashboardInterface" class="hidden">
+
+        <main class="p-4 md:p-8 max-w-[1800px] mx-auto">
+
+            <header class="top-header">
+
+                <div class="header-inner">
+
+                    <!-- LEFT BUTTONS -->
+                    <div class="header-actions">
+
+                        <button onclick="toggleBankModal()" class="header-btn">
+                            🏦 <span>Bank</span>
+                        </button>
+
+                        <button onclick="toggleCommitteeModal()" class="header-btn">
+                            👥 <span>Committee</span>
+                        </button>
+
+                        <button onclick="toggleRulesPage()" class="header-btn">
+                            📜 <span>Rules</span>
+                        </button>
+
+                    </div>
+
+                    <!-- CENTER TITLE -->
+                    <h1 id="societyTitle" class="header-title"></h1>
+
+                    <!-- RIGHT CONTROLS -->
+                    <div class="header-controls">
+
+                        <div class="control-row">
+
+                            <!-- MONTH -->
+
+                            <div style="
+        display:flex;
+        flex-direction:column;
+        gap:6px;
+    ">
+                                <label style="
+            font-size:18px;
+            font-weight:900;
+            letter-spacing:1.5px;
+            color:#8B5E3C;
+            text-transform:uppercase;
+        ">
+                                    View Month
+                                </label>
+
+                                <select id="viewMonth" onchange="handlePeriodChange()" class="header-input"></select>
+                            </div>
+
+                            <!-- YEAR -->
+
+                            <div style="
+        display:flex;
+        flex-direction:column;
+        gap:6px;
+    ">
+                                <label style="
+            font-size:18px;
+            font-weight:900;
+            letter-spacing:1.5px;
+            color:#8B5E3C;
+            text-transform:uppercase;
+        ">
+                                    View Year
+                                </label>
+
+                                <select id="viewYear" onchange="handlePeriodChange()" class="header-input"></select>
+                            </div>
+
+                        </div>
+
+                        <div class="control-box">
+                            <label class="danger-label">Global Due Day</label>
+
+                            <input type="date" id="globalDueDate" onchange="updateGlobalDueDay()" class="header-input">
+                        </div>
+
+                        <button onclick="confirmLogout()" class="logout-btn">
+                            Logout
+                        </button>
+                    </div>
+
+                </div>
+
+            </header>
+            <div class="p-4 md:p-8 max-w-[1800px] mx-auto">
+
+                <div id="adminStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+
+                    <div class="card-bg p-6 rounded-3xl text-center">
+                        <h3 id="totalOccupied" class="text-3xl font-bold">0</h3>
+                        <p class="text-[10px] text-[#7A6855] uppercase tracking-tighter">
+                            Occupied
+                        </p>
+                    </div>
+
+                    <div class="card-bg p-6 rounded-3xl text-center">
+                        <h3 id="paidCount" class="text-3xl font-bold text-emerald-400">0</h3>
+                        <p class="text-[10px] text-emerald-500 uppercase tracking-tighter">
+                            Paid
+                        </p>
+                    </div>
+
+                    <div class="card-bg p-6 rounded-3xl text-center">
+                        <h3 id="pendingCount" class="text-3xl font-bold text-rose-400">0</h3>
+                        <p class="text-[10px] text-rose-500 uppercase tracking-tighter">
+                            Pending
+                        </p>
+                    </div>
+
+                    <div class="card-bg p-6 rounded-3xl text-center">
+                        <h3 id="overdueCount" class="text-3xl font-bold text-orange-400">0</h3>
+                        <p id="overdueFlatsLabel" class="text-[10px] text-orange-500 uppercase tracking-tighter">
+                            Overdue Flats
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- DASHBOARD ANALYTICS -->
+                <div id="analyticsPanel" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+
+                    <div class="card-bg p-6 rounded-3xl text-center">
+                        <h3 id="monthlyCollection">₹0</h3>
+                        <p>Monthly Collection</p>
+                    </div>
+
+                    <div class="card-bg p-6 rounded-3xl text-center">
+                        <h3 id="pendingAmount">₹0</h3>
+                        <p>Pending Amount</p>
+                    </div>
+
+                    <div class="card-bg p-6 rounded-3xl text-center">
+                        <h3 id="yearlyPaidCount">0</h3>
+                        <p>Yearly Collection</p>
+                    </div>
+
+                    <div class="card-bg p-6 rounded-3xl text-center expense-hover-trigger" style="
+        cursor:pointer;
+        position:relative;
+     " onclick="toggleExpensePage()">
+
+                        <h3 id="monthlyExpense">₹0</h3>
+
+                        <p>Monthly Expenditure</p>
+
+
+                    </div>
+                </div>
+
+                <!-- NOTIFICATIONS PAGE -->
+                <!-- RECENT NOTIFICATIONS ON DASHBOARD -->
+                <div id="notificationsPanel" class="card-bg p-8 rounded-[35px] mb-8">
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:20px;">
+                        <h2 style="font-size:42px;font-weight:900;color:#8B5E3C;">
+                            Recent Notices
+                        </h2>
+
+                        <button onclick="toggleNoticePage()" style="
+        background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+        color:white;
+        border:none;
+        border-radius:16px;
+        font-size:22px;
+        font-weight:900;
+        padding:14px 24px;
+    ">
+                            <span id="noticeBtnText">Manage Notices</span>
+                        </button>
+                    </div>
+
+                    <div id="recentNoticeList" class="space-y-4 mt-6"></div>
+
+                </div>
+
+                <div id="mainLayout" class="flex flex-col lg:flex-row gap-6 items-start">
+
+                    <div id="residentPanel" class="hidden w-full lg:w-[400px] space-y-6 lg:sticky lg:top-28">
+                        <div class="card-bg p-8 rounded-[40px] border-amber-800/20">
+                            <h2 class="text-2xl font-bold text-[#3E2C1C] mb-1">My Dashboard</h2>
+                            <p class="text-[#7A6855] text-2xl mb-6">Flat: <span id="resFlatHeader"
+                                    class="text-[#3E2C1C] font-bold"></span></p>
+
+                            <div class="bg-amber-900/5 p-6 rounded-3xl mb-4 text-center">
+                                <span id="resDuesTitle" style="
+            display:block;
+            font-size:30px;
+            font-weight:900;
+            color:#4A3425;
+            letter-spacing:1px;
+            margin-bottom:16px;
+        ">
+                                    Monthly Dues
+                                </span>
+                                <div id="resStatusPill"
+                                    class="inline-block px-3 py-1 rounded-full font-black text-[10px] mb-2 uppercase">
+                                    PENDING</div>
+                                <h3 class="text-4xl font-black text-[#3E2C1C]">₹<span id="resAmountHeader">0</span></h3>
+                                <p style="
+        font-size:24px;
+        font-weight:800;
+        color:#9C6B45;
+        margin-top:18px;
+    ">
+                                    Due by:
+                                    <span id="resDueHeader" style="
+                color:#DC2626;
+                font-weight:900;
+                font-size:20px;
+            "></span>
+                                </p>
+                                <p id="resPaidDateRow" class="text-[22px] text-emerald-400 mt-1 hidden">
+                                    Paid Date: <span id="resPaidDateHeader"></span>
+                                    <br>
+                                    Payment Method: <span id="resPaymentMethodHeader">-</span>
+                                </p>
+                            </div>
+
+                            <div class="space-y-4">
+                                <span style="
+        display:block;
+        font-size:30px;
+        font-weight:900;
+        color:#4A3425;
+        letter-spacing:1px;
+        margin-bottom:18px;
+    ">
+                                    Payment Gateway
+                                </span>
+                                <div
+                                    class="flex flex-col items-center p-4 bg-amber-900/5 rounded-2xl border border-amber-900/10">
+                                    <img id="resQR" src=""
+                                        class="w-32 h-32 rounded-lg border-2 border-emerald-400 mb-3 hidden">
+                                    <div id="resNoQR" class="text-[#7A6855] text-[10px] italic mb-2">QR Code Not Set
+                                    </div>
+                                    <div class="text-center">
+                                        <p id="resBankName" class="text-[#3E2C1C] text-2xl font-bold">-</p>
+                                        <p id="resBankAcc" class="text-emerald-400 font-mono text-2xl">-</p>
+                                        <p id="resBankIfsc" style="
+            color:#7A6855;
+            font-family:monospace;
+            font-size:20px;
+            font-weight:900;
+            letter-spacing:1px;
+            text-transform:uppercase;
+            margin-top:10px;
+        ">
+                                            -
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 w-full">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center gap-4">
+                                <h2 style="
+    font-size:48px;
+    font-weight:900;
+    color:#8B5E3C !important;
+    letter-spacing:1px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    text-shadow: 0 2px 10px rgba(139,94,60,0.15);
+">
+                                    <span style="
+        width:14px;
+        height:14px;
+        background:#29B6F6;
+        border-radius:50%;
+        display:inline-block;
+    "></span>
+
+                                    Society Status
+                                </h2>
+                                <div id="blockFilterContainer" class="hidden md:flex gap-2">
+                                    <select id="blockFilter" onchange="applyFilters()" style="
+    height:52px;
+    padding:0 16px;
+    font-size:20px;
+    font-weight:800;
+    border-radius:14px;
+    min-width:160px;
+    color:#5B3A29;
+">
+                                        <option value="">All Blocks</option>
+
+                                    </select>
+
+                                    <select id="paymentMethodFilter" class="hidden" onchange="applyFilters()" style="
+        height:52px;
+        padding:0 16px;
+        font-size:20px;
+        font-weight:800;
+        border-radius:14px;
+        min-width:190px;
+        color:#5B3A29;
+    ">
+                                        <option value="all">All Payments</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Check">Check</option>
+                                        <option value="Bank Transfer">Bank Transfer</option>
+                                        <option value="UPI">UPI</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:12px;">
+                                <button onclick="openWhatsAppBlast('pending')" id="waBlasPendingBtn" class="hidden"
+                                    style="background:linear-gradient(135deg,#EF4444,#B91C1C);color:white;border:none;height:52px;padding:0 16px;border-radius:14px;font-size:15px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;gap:6px;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 8px 16px rgba(239,68,68,0.25);white-space:nowrap;flex-shrink:0;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                                        <path
+                                            d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.852L.057 23.5l5.817-1.448A11.935 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.853 0-3.596-.498-5.1-1.367l-.365-.214-3.766.937.976-3.644-.237-.376A9.946 9.946 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+                                    </svg>
+                                    Notify Pending
+                                </button>
+                                <button onclick="openWhatsAppBlast('paid')" id="waBlastPaidBtn" class="hidden"
+                                    style="background:linear-gradient(135deg,#22C55E,#15803D);color:white;border:none;height:52px;padding:0 16px;border-radius:14px;font-size:15px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;gap:6px;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 8px 16px rgba(34,197,94,0.25);white-space:nowrap;flex-shrink:0;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                                        <path
+                                            d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.852L.057 23.5l5.817-1.448A11.935 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.853 0-3.596-.498-5.1-1.367l-.365-.214-3.766.937.976-3.644-.237-.376A9.946 9.946 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+                                    </svg>
+                                    Notify Paid
+                                </button>
+
+
+
+                                <button onclick="exportToExcel()" id="exportBtn" class="hidden"
+                                    style="background:linear-gradient(135deg,#10B981,#047857);color:white;border:none;height:52px;padding:0 16px;border-radius:14px;font-size:15px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;gap:6px;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 8px 16px rgba(16,185,129,0.25);white-space:nowrap;flex-shrink:0;">
+                                    📥 Export Excel
+                                </button>
+                            </div>
+                        </div>
+
+                        <input id="searchBox" type="text" maxlength="100" placeholder="Search any flat details..."
+                            onkeyup="applyFilters()">
+                        <div class="card-bg rounded-[30px] overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="table-header-row">
+                                            <th id="thFlatHeader" class="p-6">FLAT</th>
+                                            <th class="p-6">RESIDENT DETAILS</th>
+                                            <th class="p-6">
+
+                                                <div style="
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:10px;
+    ">
+
+                                                    <span style="
+            font-size:17px;
+            font-weight:900;
+            letter-spacing:1px;
+            color:#7B4B2A;
+        ">
+                                                        STATUS
+                                                    </span>
+
+                                                    <select id="statusFilter" onchange="applyFilters()" style="
+            background:#ffffff;
+
+            color:#7B4B2A;
+
+            border:2px solid #D9C3AE;
+
+            border-radius:12px;
+
+            padding:8px 14px;
+
+            font-size:14px;
+
+            font-weight:800;
+
+            outline:none;
+
+            cursor:pointer;
+
+            box-shadow:0 4px 12px rgba(111,74,47,0.08);
+        ">
+                                                        <option value="">All Status</option>
+                                                        <option value="Paid">Paid</option>
+                                                        <option value="Pending">Pending</option>
+                                                    </select>
+
+                                                </div>
+
+                                            </th>
+                                            <th class="p-6">PAID DATE</th>
+                                            <th class="p-6">
+
+                                                <div style="
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    ">
+
+                                                    <span style="
+            font-size:18px;
+            font-weight:900;
+            color:#8B5E3C;
+            letter-spacing:1px;
+        ">
+                                                        AMOUNT
+                                                    </span>
+
+                                                    <select id="planFilter" onchange="applyFilters()" style="
+                height:42px;
+                padding:0 12px;
+                border-radius:12px;
+                border:1px solid rgba(139,94,60,0.22);
+                font-size:15px;
+                font-weight:800;
+                color:#5B3A29;
+                background:white;
+                min-width:140px;
+            ">
+                                                        <option value="all">All</option>
+                                                        <option value="monthly">Monthly</option>
+                                                        <option value="yearly">Yearly</option>
+                                                    </select>
+
+                                                </div>
+
+                                            </th>
+                                            <th class="p-6 text-center">ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dashboardTable" class="divide-y divide-amber-900/10"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <div id="adminForm" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeForm()"></div>
+        <div
+            class="card-bg relative w-full max-w-5xl p-8 rounded-[35px] shadow-2xl border border-amber-800/20 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h2 id="editFormHeading" class="text-2xl font-bold text-[#8B5E3C]">
+                    Edit Record
+                </h2>
+
+                <button onclick="closeForm()" style="
+            width:48px;
+            height:48px;
+            border-radius:50%;
+            background:#A67C52;
+            color:white;
+            font-size:28px;
+            font-weight:900;
+            border:none;
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            transition:0.2s;
+        ">
+                    ×
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+
+                <div>
+                    <span style="
+            font-size:34px;
+            font-weight:900;
+            color:#8B5E3C;
+            display:block;
+            margin-bottom:10px;
+        ">
+                        Owner
+                    </span>
+
+                    <input id="ownerName" type="text" maxlength="30" class="p-4 rounded-xl input-field w-full">
+                </div>
+
+                <div>
+                    <span style="
+            font-size:34px;
+            font-weight:900;
+            color:#8B5E3C;
+            display:block;
+            margin-bottom:10px;
+        ">
+                        Phone
+                    </span>
+
+                    <input id="phone" type="text" maxlength="10" class="p-4 rounded-xl input-field w-full">
+                </div>
+
+            </div>
+
+            <div id="residentCredentialsSection" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+
+                <div>
+                    <span style="
+            font-size:34px;
+            font-weight:900;
+            color:#8B5E3C;
+            display:block;
+            margin-bottom:10px;
+        ">
+                        Resident Username
+                    </span>
+
+                    <input id="resUsername" type="text" maxlength="30" placeholder="Unique Resident Username" class="p-4 rounded-xl input-field w-full">
+                </div>
+
+                <div>
+                    <span style="
+            font-size:34px;
+            font-weight:900;
+            color:#8B5E3C;
+            display:block;
+            margin-bottom:10px;
+        ">
+                        Resident Password
+                    </span>
+
+                    <input id="resPasswordInput" type="password" maxlength="30" placeholder="Set Password (optional)" class="p-4 rounded-xl input-field w-full">
+                </div>
+
+            </div>
+
+            <div class="p-5 bg-amber-900/5 rounded-2xl mb-6 border border-amber-900/10">
+
+                <div class="flex items-center gap-4 mb-4">
+
+                    <span style="
+            font-size:34px;
+            font-weight:900;
+            color:#8B5E3C;
+            line-height:1.2;
+        ">
+                        Tenant Status
+                    </span>
+
+                    <select id="isRental" onchange="toggleRentalFields()"
+                        class="p-1 rounded-lg input-field text-[10px]">
+                        <option value="No">Self Occupied</option>
+                        <option value="Yes">Rental</option>
+                    </select>
+
+                </div>
+
+                <div id="rentalInputs" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    <input id="rentalName" type="text" placeholder="Tenant Name" maxlength="30"
+                        class="p-4 rounded-xl input-field">
+
+                    <input id="rentalPhone" type="text" maxlength="10" placeholder="Tenant Mobile"
+                        class="p-4 rounded-xl input-field">
+
+                </div>
+
+            </div>
+
+            <!-- OWNERSHIP TRANSFER SECTION -->
+            <div id="ownerTransferSection" style="
+                background: linear-gradient(135deg, rgba(139,94,60,0.08), rgba(192,138,91,0.05));
+                border: 1.5px solid rgba(139,94,60,0.2);
+                border-radius: 20px;
+                padding: 20px 24px;
+                margin-bottom: 24px;
+            ">
+                <div style="display:flex; align-items:center; gap:14px; margin-bottom:0;">
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                        <input type="checkbox" id="enableTransfer" onchange="toggleTransferFields()" style="
+                            width:22px; height:22px; accent-color:#8B5E3C; cursor:pointer;
+                        ">
+                        <span style="font-size:22px; font-weight:900; color:#8B5E3C;">
+                            Schedule Ownership Transfer?
+                        </span>
+                    </label>
+                    <span style="font-size:14px; color:#9C6B45; font-weight:700;">
+                        (e.g. current owner until Dec, new owner from Jan)
+                    </span>
+                </div>
+
+                <div id="transferFields" class="hidden" style="margin-top:16px;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:14px; align-items:end;">
+                        <div>
+                            <span
+                                style="font-size:18px; font-weight:900; color:#8B5E3C; display:block; margin-bottom:8px;">
+                                New Owner Name
+                            </span>
+                            <input id="futureOwnerName" type="text" maxlength="30" placeholder="e.g. Rahul Sharma"
+                                class="p-4 rounded-xl input-field w-full" style="font-size:18px;"
+                                oninput="updateTransferPreview()">
+                        </div>
+                        <div>
+                            <span
+                                style="font-size:18px; font-weight:900; color:#8B5E3C; display:block; margin-bottom:8px;">
+                                New Owner Phone
+                            </span>
+                            <input id="futureOwnerPhone" type="text" maxlength="10" placeholder="e.g. 9876543210"
+                                class="p-4 rounded-xl input-field w-full" style="font-size:18px;">
+                        </div>
+                        <div>
+                            <span
+                                style="font-size:18px; font-weight:900; color:#8B5E3C; display:block; margin-bottom:8px;">
+                                Transfer From Month
+                            </span>
+                            <select id="transferMonth" class="input-field w-full p-4 rounded-xl" style="font-size:18px;"
+                                onchange="updateTransferPreview()">
+                                <option value="January">January</option>
+                                <option value="February">February</option>
+                                <option value="March">March</option>
+                                <option value="April">April</option>
+                                <option value="May">May</option>
+                                <option value="June">June</option>
+                                <option value="July">July</option>
+                                <option value="August">August</option>
+                                <option value="September">September</option>
+                                <option value="October">October</option>
+                                <option value="November">November</option>
+                                <option value="December">December</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span
+                                style="font-size:18px; font-weight:900; color:#8B5E3C; display:block; margin-bottom:8px;">
+                                Transfer Year
+                            </span>
+                            <select id="transferYear" class="input-field w-full p-4 rounded-xl" style="font-size:18px;"
+                                onchange="updateTransferPreview()">
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                    </div>
+                    <div style="
+                        margin-top:12px;
+                        padding:10px 16px;
+                        background:rgba(217,119,6,0.1);
+                        border-radius:12px;
+                        border:1px solid rgba(217,119,6,0.2);
+                    ">
+                        <span id="transferPreviewText" style="font-size:15px; font-weight:800; color:#B45309;">
+                            📋 Preview: Current owner keeps all months before the selected transfer date. New owner gets
+                            all months from the transfer date onwards.
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="edit-payment-grid">
+
+                <div class="edit-field">
+                    <span>Status</span>
+                    <select id="maintenance" class="input-field">
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                    </select>
+                </div>
+
+                <div class="edit-field">
+                    <span>Plan</span>
+                    <select id="paymentPlan" onchange="updateYearlyAmount()" class="input-field">
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
+
+                <div class="edit-field">
+                    <span>Amount</span>
+                    <input id="maintenanceAmount" type="number" min="0" max="999999" oninput="
+        if(this.value.length > 7)
+        this.value = this.value.slice(0,7);
+    " class="input-field">
+                </div>
+
+                <div class="edit-field">
+                    <span>Payment Method</span>
+                    <select id="paymentMethod" class="input-field">
+                        <option value="Cash">💵 Cash</option>
+                        <option value="Check">🪙 Check</option>
+                        <option value="Bank Transfer">🏦 Bank Transfer</option>
+                        <option value="UPI">📱 UPI</option>
+                    </select>
+                </div>
+
+            </div>
+            <input type="hidden" id="block"><input type="hidden" id="flatNumber"><input type="hidden"
+                id="editMonth"><input type="hidden" id="editYear">
+
+            <div class="flex justify-center mt-6">
+
+                <button onclick="saveFlat()" style="
+            position:relative;
+
+            overflow:hidden;
+
+            padding:18px 42px;
+
+            border:none;
+
+            border-radius:18px;
+
+            background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+
+            color:white;
+
+            font-size:24px;
+
+            font-weight:900;
+
+            letter-spacing:1px;
+
+            cursor:pointer;
+
+            display:flex;
+
+            align-items:center;
+            
+            gap:14px;
+
+            box-shadow:
+                0 12px 28px rgba(139,94,60,0.28);
+
+            transition:0.25s ease;
+        " onmouseover="
+            this.style.transform='translateY(-3px) scale(1.03)';
+            this.style.boxShadow='0 18px 36px rgba(139,94,60,0.38)';
+        " onmouseout="
+            this.style.transform='translateY(0px) scale(1)';
+            this.style.boxShadow='0 12px 28px rgba(139,94,60,0.28)';
+        ">
+
+                    <span style="
+            font-size:28px;
+        ">
+                        💾
+                    </span>
+
+                    <span style="
+    color:white;
+">
+                        Save Changes
+                    </span>
+
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="committeeModal" class="hidden fixed inset-0 flex items-center justify-center z-[110] p-4">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-lg" onclick="toggleCommitteeModal()"></div>
+        <div class="card-bg w-full max-w-lg p-8 rounded-[40px] relative border-amber-400/20">
+            <h3 class="text-2xl font-bold mb-6" style="color:#8B5E3C;">
+                Committee
+            </h3>
+            <div id="committeeListView" class="space-y-4 max-h-[400px] overflow-y-auto pr-2"></div>
+            <div id="adminCommitteeSection" class="hidden mt-8 pt-6 border-t border-amber-900/10">
+                <input id="commName" maxlength="30" oninput="updateCommitteeButton()" placeholder="Name"
+                    class="p-3 input-field rounded-xl text-2xl w-full mb-2">
+
+                <input id="commRole" maxlength="30" oninput="updateCommitteeButton()"
+                    placeholder="Role (Secretary, Chairman...)" class="p-3 input-field rounded-xl text-2xl w-full mb-2">
+
+                <input id="commPhone" maxlength="10" oninput="updateCommitteeButton()" placeholder="Phone"
+                    class="p-3 input-field rounded-xl text-2xl w-full mb-4">
+
+                <button id="addMemberBtn" onclick="saveCommitteeMember()" style="
+    width:100%;
+
+    background:linear-gradient(135deg,#D97706,#F59E0B);
+
+    color:white;
+
+    padding:22px;
+
+    border-radius:22px;
+
+    font-size:34px;
+
+    font-weight:900;
+
+    border:none;
+
+    cursor:pointer;
+
+    box-shadow:0 10px 24px rgba(217,119,6,0.22);
+
+    letter-spacing:0.5px;
+">
+                    Add Member
+                </button>
+            </div>
+            <button onclick="toggleCommitteeModal()" style="
+    width:100%;
+
+    color:#7A6855;
+
+    font-size:35px;
+
+    font-weight:800;
+
+    margin-top:32px;
+
+    background:none;
+
+    border:none;
+
+    cursor:pointer;
+">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <div id="bankModal" class="hidden fixed inset-0 flex items-center justify-center z-[100] p-4">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="toggleBankModal()"></div>
+        <div class="card-bg w-full max-w-md p-8 rounded-[40px] relative">
+            <h3 class="text-2xl font-bold text-[#8B5E3C] mb-6 text-center">Bank Account Info</h3>
+            <div id="bankView" class="bg-amber-900/5 p-6 rounded-3xl mb-6 text-center border border-amber-900/10">
+                <img id="qrPreview" src="" alt="QR"
+                    class="mx-auto hidden mb-4 max-w-[150px] border-2 border-cyan-400 rounded-lg">
+                <p id="vBank" class="text-[#3E2C1C] font-bold text-2xl">-</p>
+                <p id="vAcc" class="text-[#8B5E3C] font-mono text-2xl">-</p>
+                <p id="vIfsc" class="text-[#7A6855] font-mono text-2xl uppercase">-</p>
+            </div>
+            <div id="adminBankSection" class="hidden space-y-3">
+                <input id="ebank" maxlength="30" placeholder="Account Name" class="w-full p-4 input-field rounded-xl">
+                <input id="eacc" maxlength="20" placeholder="Account Number" class="w-full p-4 input-field rounded-xl">
+                <input id="eifsc" maxlength="11" placeholder="IFSC" class="w-full p-4 input-field rounded-xl">
+                <input type="file" id="eqr" class="text-2xl text-[#7A6855] mt-2">
+                <button onclick="saveBank()"
+                    class="w-full bg-emerald-600 py-4 rounded-xl font-bold mt-2 uppercase tracking-widest">Update
+                    Details</button>
+            </div>
+            <button onclick="toggleBankModal()" class="w-full text-[#7A6855] text-2xl mt-4">Close</button>
+        </div>
+    </div>
+
+    <div id="rulesPage" class="hidden fixed inset-0 z-[300] bg-[#f8f5f0] overflow-y-auto">
+
+        <div class="max-w-6xl mx-auto p-8">
+
+            <div class="flex justify-between items-center mb-8">
+                <h1 style="font-size:52px;font-weight:900;color:#8B5E3C;">
+                    Society Rules & Regulations
+                </h1>
+
+                <button onclick="toggleRulesPage()" style="
+                background:#8B5E3C;
+                color:white;
+                border:none;
+                border-radius:16px;
+                font-size:24px;
+                font-weight:900;
+                padding:16px 28px;
+            ">
+                    Back
+                </button>
+            </div>
+
+            <div id="adminRulesForm" class="card-bg p-6 rounded-3xl mb-8">
+                <input id="ruleTitle" maxlength="50" class="input-field p-4 rounded-xl mb-4" placeholder="Rule Title">
+
+                <textarea id="ruleDetails" maxlength="300" class="input-field p-4 rounded-xl mb-4"
+                    placeholder="Rule Details" style="height:140px;font-size:22px;font-weight:700;"></textarea>
+
+                <button onclick="saveRule()" style="
+                background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                color:white;
+                border:none;
+                border-radius:16px;
+                font-size:24px;
+                font-weight:900;
+                padding:16px 30px;
+            ">
+                    Save Rule
+                </button>
+            </div>
+
+            <div id="rulesList" class="space-y-5"></div>
+
+        </div>
+    </div>
+    <div id="noticePage" class="hidden fixed inset-0 z-[350] bg-[#f8f5f0] overflow-y-auto">
+
+        <div class="max-w-6xl mx-auto p-8">
+
+            <div class="flex justify-between items-center mb-8">
+                <h1 style="font-size:52px;font-weight:900;color:#8B5E3C;">
+                    Society Notices
+                </h1>
+
+                <button onclick="toggleNoticePage()" style="
+                background:#8B5E3C;
+                color:white;
+                border:none;
+                border-radius:16px;
+                font-size:24px;
+                font-weight:900;
+                padding:16px 28px;
+            ">
+                    Back
+                </button>
+            </div>
+
+            <div id="adminNoticeForm" class="card-bg p-6 rounded-3xl mb-8">
+                <input id="noticeTitle" maxlength="50" class="input-field p-4 rounded-xl mb-4"
+                    placeholder="Notice Title">
+
+                <textarea id="noticeDetails" maxlength="400" class="input-field p-4 rounded-xl mb-4"
+                    placeholder="Notice Details" style="height:140px;font-size:22px;font-weight:700;"></textarea>
+
+                <button onclick="addNotice()" style="
+                background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                color:white;
+                border:none;
+                border-radius:16px;
+                font-size:24px;
+                font-weight:900;
+                padding:16px 30px;
+            ">
+                    Save Notice
+                </button>
+            </div>
+
+            <div id="noticeList" class="space-y-5"></div>
+
+        </div>
+    </div>
+    <div id="expensePage" class="hidden fixed inset-0 z-[360] bg-[#f8f5f0] overflow-y-auto">
+
+        <div class="max-w-6xl mx-auto p-8">
+
+            <div class="flex justify-between items-center mb-8">
+                <h1 style="font-size:52px;font-weight:900;color:#8B5E3C;">
+                    Society Expenditure
+                </h1>
+
+                <button onclick="toggleExpensePage()" style="
+                background:#8B5E3C;
+                color:white;
+                border:none;
+                border-radius:16px;
+                font-size:24px;
+                font-weight:900;
+                padding:16px 28px;
+            ">
+                    Back
+                </button>
+            </div>
+
+            <div id="expenseDashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+
+                <div class="card-bg p-6 rounded-3xl text-center">
+                    <h3 id="expenseMonthlyTotal">₹0</h3>
+                    <p>Monthly Expenditure</p>
+                </div>
+
+                <div class="card-bg p-6 rounded-3xl text-center">
+                    <h3 id="expenseYearlyTotal">₹0</h3>
+                    <p>Yearly Expenditure</p>
+                </div>
+
+            </div>
+
+            <div id="adminExpenseForm" class="card-bg p-6 rounded-3xl mb-8">
+
+                <input id="expenseTitle" maxlength="40" class="input-field p-4 rounded-xl mb-4"
+                    placeholder="Expenditure Title">
+
+                <input id="expenseAmount" type="number" min="0" max="99999999" oninput="
+        if(this.value.length > 8)
+        this.value = this.value.slice(0,8);
+    " class="input-field p-4 rounded-xl mb-4" placeholder="Amount">
+
+                <textarea id="expenseDetails" maxlength="350" class="input-field p-4 rounded-xl mb-4"
+                    placeholder="Expenditure Details" style="
+        height:140px;
+        font-size:22px;
+        font-weight:700;
+    "></textarea>
+
+                <button onclick="saveExpense()" style="
+                background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                color:white;
+                border:none;
+                border-radius:16px;
+                font-size:24px;
+                font-weight:900;
+                padding:16px 30px;
+            ">
+                    Save Expenditure
+                </button>
+
+            </div>
+
+            <div id="expenseList" class="space-y-5"></div>
+
+        </div>
+
+    </div>
+    <div id="complaintPage" class="hidden fixed inset-0 z-[370] bg-[#f8f5f0] overflow-y-auto">
+
+        <div class="max-w-6xl mx-auto p-8">
+
+            <div class="flex justify-between items-center mb-8">
+                <h1 style="font-size:52px;font-weight:900;color:#8B5E3C;">
+                    Society Complaints
+                </h1>
+
+                <button onclick="closeComplaintPage()" style="
+                background:#8B5E3C;
+                color:white;
+                border:none;
+                border-radius:16px;
+                font-size:24px;
+                font-weight:900;
+                padding:16px 28px;
+            ">
+                    Back
+                </button>
+            </div>
+
+            <div class="card-bg p-6 rounded-3xl mb-8">
+                <input id="complaintTitle" type="text" maxlength="40" class="input-field p-4 rounded-xl mb-4"
+                    placeholder="Complaint Title">
+
+                <input id="complaintFlat" maxlength="5" class="input-field p-4 rounded-xl mb-4"
+                    placeholder="Flat Number e.g. A-1">
+
+                <textarea id="complaintDetails" maxlength="300" class="input-field p-4 rounded-xl mb-4"
+                    placeholder="Complaint Details" style="
+        height:140px;
+        font-size:22px;
+        font-weight:700;
+    "></textarea>
+
+                <button onclick="saveComplaint()" style="
+                background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                color:white;
+                border:none;
+                border-radius:16px;
+                font-size:24px;
+                font-weight:900;
+                padding:16px 30px;
+            ">
+                    Save Complaint
+                </button>
+            </div>
+
+            <div id="complaintList" class="space-y-5"></div>
+
+        </div>
+    </div>
+
+
+
+    <div id="rowHoverTooltip">
+        Click to edit details
+    </div>
+    <div id="expenseHoverTooltip">
+        Click to see all expenditure
+    </div>
+    <button id="floatingComplaintBtn" type="button" onclick="openComplaintPage()">
+        <span>🛠️</span>
+        <span class="floating-text">Complaints</span>
+    </button>
+
+    <!-- ==================== RESIDENT FORGOT PASSWORD MODAL ==================== -->
+    <div id="residentForgotModal" class="hidden fixed inset-0 z-[500] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeResidentForgotModal()"></div>
+        <div class="card-bg relative w-full max-w-xl p-10 rounded-[40px] shadow-2xl border border-amber-800/20">
+
+            <!-- Close Button -->
+            <button onclick="closeResidentForgotModal()" style="
+                position:absolute; top:20px; right:20px;
+                width:44px; height:44px; border-radius:50%;
+                background:#8B5E3C; color:white;
+                font-size:22px; font-weight:900; border:none;
+                cursor:pointer; display:flex; align-items:center; justify-content:center;
+            ">×</button>
+
+            <!-- Step indicators -->
+            <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:30px;">
+                <div id="rfStep1Dot"
+                    style="width:12px;height:12px;border-radius:50%;background:#8B5E3C;transition:0.3s;"></div>
+                <div id="rfStep2Dot" style="width:8px;height:8px;border-radius:50%;background:#D2B48C;transition:0.3s;">
+                </div>
+                <div id="rfStep3Dot" style="width:8px;height:8px;border-radius:50%;background:#D2B48C;transition:0.3s;">
+                </div>
+            </div>
+
+            <h2 style="font-size:36px;font-weight:900;color:#8B5E3C;text-align:center;margin-bottom:8px;">
+                Forgot Password
+            </h2>
+            <p id="rfStepLabel"
+                style="font-size:20px;color:#7A6855;text-align:center;margin-bottom:28px;font-weight:600;">
+                Step 1: Verify your identity
+            </p>
+
+            <!-- STEP 1: Society, Flat, Phone -->
+            <div id="rfStep1">
+                <div style="margin-bottom:16px;">
+                    <input id="rfSociety" type="text" maxlength="40" placeholder="Society Name" class="input-field"
+                        style="
+                        width:100%; height:72px; padding:18px 22px;
+                        border-radius:18px; font-size:26px; font-weight:700;
+                    ">
+                    <p id="rfSocietyErr"
+                        style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;"></p>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <input id="rfFlat" type="text" maxlength="6" placeholder="Flat Number (e.g. A-1)"
+                        class="input-field" style="
+                        width:100%; height:72px; padding:18px 22px;
+                        border-radius:18px; font-size:26px; font-weight:700;
+                    ">
+                    <p id="rfFlatErr" style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;">
+                    </p>
+                </div>
+                <div style="margin-bottom:24px;">
+                    <input id="rfPhone" type="text" maxlength="10" placeholder="Registered Phone Number"
+                        class="input-field" style="
+                        width:100%; height:72px; padding:18px 22px;
+                        border-radius:18px; font-size:26px; font-weight:700;
+                    " oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                    <p id="rfPhoneErr"
+                        style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;"></p>
+                </div>
+                <p id="rfStep1GeneralErr"
+                    style="color:#DC2626;font-size:20px;font-weight:700;margin-bottom:14px;display:none;text-align:center;">
+                </p>
+                <button id="rfSendOtpBtn" onclick="rfSendOtp()" style="
+                    width:100%; height:72px; border:none; border-radius:18px;
+                    background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                    color:white; font-size:26px; font-weight:900; cursor:pointer;
+                    box-shadow:0 10px 28px rgba(139,94,60,0.28); transition:0.25s;
+                ">Send OTP</button>
+            </div>
+
+            <!-- STEP 2: OTP verification -->
+            <div id="rfStep2" class="hidden">
+                <p style="text-align:center;font-size:20px;color:#7A6855;font-weight:600;margin-bottom:20px;">
+                    A 6-digit code has been sent to your phone number.
+                </p>
+                <div style="margin-bottom:24px;">
+                    <input id="rfOtp" type="text" maxlength="6" placeholder="Enter 6-digit OTP" class="input-field"
+                        style="
+                        width:100%; height:72px; padding:18px 22px;
+                        border-radius:18px; font-size:30px; font-weight:900;
+                        letter-spacing:8px; text-align:center;
+                    " oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                    <p id="rfOtpErr"
+                        style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;text-align:center;">
+                    </p>
+                </div>
+                <button onclick="rfVerifyOtp()" style="
+                    width:100%; height:72px; border:none; border-radius:18px;
+                    background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                    color:white; font-size:26px; font-weight:900; cursor:pointer;
+                    box-shadow:0 10px 28px rgba(139,94,60,0.28);
+                ">Verify Code</button>
+                <button onclick="rfGoBack(1)" style="
+                    width:100%; background:none; border:none; color:#7A6855;
+                    font-size:22px; font-weight:800; margin-top:14px; cursor:pointer;
+                ">← Go Back</button>
+            </div>
+
+            <!-- STEP 3: New Password -->
+            <div id="rfStep3" class="hidden">
+                <p style="text-align:center;font-size:20px;color:#7A6855;font-weight:600;margin-bottom:20px;">
+                    OTP Verified ✅ Now set your new credentials.
+                </p>
+                <div style="margin-bottom:16px;">
+                    <input id="rfNewUsername" type="text" maxlength="30" placeholder="New Username (Optional)" class="input-field"
+                        style="
+                        width:100%; height:72px; padding:18px 22px;
+                        border-radius:18px; font-size:26px; font-weight:700;
+                    ">
+                    <p id="rfNewUsernameErr"
+                        style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;"></p>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <input id="rfNewPass" type="password" maxlength="20" placeholder="New Password" class="input-field"
+                        style="
+                        width:100%; height:72px; padding:18px 22px;
+                        border-radius:18px; font-size:26px; font-weight:700;
+                    ">
+                    <p id="rfNewPassErr"
+                        style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;"></p>
+                </div>
+                <div style="margin-bottom:24px;">
+                    <input id="rfConfirmPass" type="password" maxlength="20" placeholder="Confirm New Password"
+                        class="input-field" style="
+                        width:100%; height:72px; padding:18px 22px;
+                        border-radius:18px; font-size:26px; font-weight:700;
+                    ">
+                    <p id="rfConfirmPassErr"
+                        style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;"></p>
+                </div>
+                <button onclick="rfResetPassword()" style="
+                    width:100%; height:72px; border:none; border-radius:18px;
+                    background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                    color:white; font-size:26px; font-weight:900; cursor:pointer;
+                    box-shadow:0 10px 28px rgba(139,94,60,0.28);
+                ">Reset Password</button>
+            </div>
+
+        </div>
+    </div>
+    <!-- ==================== WHATSAPP BLAST MODAL ==================== -->
+    <div id="waBlastModal" class="hidden fixed inset-0 z-[700] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="closeWaBlastModal()"></div>
+        <div class="relative w-full max-w-3xl rounded-[36px] overflow-hidden shadow-2xl"
+            style="background:rgba(255,255,255,0.97);max-height:90vh;display:flex;flex-direction:column;">
+
+            <!-- Header -->
+            <div id="waBlastHeader"
+                style="padding:32px 36px 24px;border-bottom:1px solid rgba(139,94,60,0.12);flex-shrink:0;">
+                <button onclick="closeWaBlastModal()"
+                    style="position:absolute;top:20px;right:24px;width:44px;height:44px;border-radius:50%;background:#F1F5F9;border:none;font-size:22px;cursor:pointer;font-weight:900;">×</button>
+                <div id="waBlastIcon"
+                    style="width:60px;height:60px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="white">
+                        <path
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                        <path
+                            d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.852L.057 23.5l5.817-1.448A11.935 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.853 0-3.596-.498-5.1-1.367l-.365-.214-3.766.937.976-3.644-.237-.376A9.946 9.946 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+                    </svg>
+                </div>
+                <h2 id="waBlastTitle" style="font-size:32px;font-weight:950;color:#1A1A2E;margin:0 0 6px;"></h2>
+                <p id="waBlastSubtitle" style="font-size:18px;font-weight:700;color:#6B7280;margin:0;"></p>
+            </div>
+
+            <!-- Scrollable body -->
+            <div style="overflow-y:auto;flex:1;padding:24px 36px;">
+
+                <!-- Message Preview -->
+                <div style="margin-bottom:24px;">
+                    <label
+                        style="display:block;font-size:15px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:#8B5E3C;margin-bottom:10px;">Message
+                        Preview</label>
+                    <textarea id="waBlastMessage" rows="6"
+                        style="width:100%;border-radius:18px;padding:18px;font-size:17px;font-weight:600;color:#1A1A2E;border:1.5px solid rgba(139,94,60,0.2);background:rgba(248,245,240,0.8);resize:vertical;line-height:1.6;font-family:inherit;"></textarea>
+                </div>
+
+                <!-- Resident List -->
+                <div>
+                    <label
+                        style="display:block;font-size:15px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:#8B5E3C;margin-bottom:12px;">
+                        Residents to Notify — <span id="waBlastCount" style="color:#1A1A2E;">0</span> found
+                    </label>
+                    <div id="waBlastList"
+                        style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;padding-right:4px;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div
+                style="padding:20px 36px 28px;border-top:1px solid rgba(139,94,60,0.1);flex-shrink:0;display:flex;gap:12px;flex-wrap:wrap;">
+                <button onclick="copyWaMessage()"
+                    style="flex:1;padding:16px;border-radius:16px;border:2px solid rgba(139,94,60,0.25);background:white;font-size:18px;font-weight:900;color:#8B5E3C;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;">
+                    📋 Copy Group Message
+                </button>
+                <button onclick="sendAllBlastIndividually()" id="waBlastSendAllBtn"
+                    style="flex:1;padding:16px;border-radius:16px;border:none;font-size:18px;font-weight:900;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 16px rgba(0,0,0,0.15);">
+                    ⚡ Send Individually (All)
+                </button>
+                <button onclick="shareWaSummary()" id="waBlastSendBtn"
+                    style="flex:1;padding:16px;border-radius:16px;border:none;font-size:18px;font-weight:900;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                        <path
+                            d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.852L.057 23.5l5.817-1.448A11.935 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.853 0-3.596-.498-5.1-1.367l-.365-.214-3.766.937.976-3.644-.237-.376A9.946 9.946 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+                    </svg>
+                    Share via WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== GLOBAL CONFIRM MODAL ==================== -->
+    <div id="globalConfirmModal" class="hidden fixed inset-0 z-[600] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="handleConfirm(false)"></div>
+        <div
+            class="card-bg relative w-full max-w-sm p-8 rounded-[32px] shadow-2xl border border-amber-800/20 text-center">
+            <h3 id="confirmMsg"
+                style="font-size:24px;font-weight:800;color:#4A3425;margin-bottom:24px;line-height:1.4;">
+                Are you sure?
+            </h3>
+            <div style="display:flex;gap:12px;justify-content:center;">
+                <button id="confirmCancelBtn" onclick="handleConfirm(false)"
+                    style="flex:1;background:#E5E7EB;color:#4B5563;border:none;border-radius:16px;padding:14px;font-size:18px;font-weight:800;cursor:pointer;">
+                    Cancel
+                </button>
+                <button id="confirmYesBtn" onclick="handleConfirm(true)"
+                    style="flex:1;background:#DC2626;color:white;border:none;border-radius:16px;padding:14px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(220,38,38,0.25);">
+                    Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== ADMIN FORGOT PASSWORD MODAL ==================== -->
+    <div id="adminForgotModal" class="hidden fixed inset-0 z-[500] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeAdminForgotModal()"></div>
+        <div class="card-bg relative w-full max-w-xl p-10 rounded-[40px] shadow-2xl border border-amber-800/20">
+
+            <button onclick="closeAdminForgotModal()" style="
+                position:absolute; top:20px; right:20px;
+                width:44px; height:44px; border-radius:50%;
+                background:#8B5E3C; color:white;
+                font-size:22px; font-weight:900; border:none;
+                cursor:pointer; display:flex; align-items:center; justify-content:center;
+            ">×</button>
+
+            <h2 style="font-size:36px;font-weight:900;color:#8B5E3C;text-align:center;margin-bottom:8px;">
+                Admin Credentials Reset
+            </h2>
+            <p style="font-size:20px;color:#7A6855;text-align:center;margin-bottom:28px;font-weight:600;">
+                Verify your identity then set new credentials
+            </p>
+
+
+            <div style="margin-bottom:16px;">
+                <input id="afUsername" type="text" maxlength="20" placeholder="Current Username" class="input-field"
+                    style="
+                    width:100%; height:72px; padding:18px 22px;
+                    border-radius:18px; font-size:26px; font-weight:700;
+                ">
+                <p id="afUsernameErr" style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;">
+                </p>
+            </div>
+            <div style="margin-bottom:16px;">
+                <input id="afChairmanPhone" type="tel" maxlength="10" placeholder="Chairman Phone Number" class="input-field"
+                    style="
+                    width:100%; height:72px; padding:18px 22px;
+                    border-radius:18px; font-size:26px; font-weight:700;
+                ">
+                <p id="afChairmanPhoneErr" style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;">
+                </p>
+            </div>
+            <!-- Verify Button -->
+            <button id="afVerifyBtn" onclick="afVerifyIdentity()" style="
+                width:100%; height:72px; border:none; border-radius:18px;
+                background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                color:white; font-size:26px; font-weight:900; cursor:pointer;
+                box-shadow:0 10px 28px rgba(139,94,60,0.28); margin-bottom:16px;
+            ">Verify Identity & Send OTP</button>
+
+            <div id="afOtpSection" style="display:none;">
+                <div style="margin-bottom:16px;">
+                    <input id="afOtp" type="text" maxlength="6"
+                        placeholder="Enter 6-digit OTP" class="input-field" style="
+                    width:100%; height:72px; padding:18px 22px;
+                    border-radius:18px; font-size:26px; font-weight:700; letter-spacing:4px; text-align:center;
+                ">
+                    <p id="afOtpErr"
+                        style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;"></p>
+                </div>
+                <button id="afConfirmOtpBtn" onclick="afVerifyOtp()" style="
+                    width:100%; height:72px; border:none; border-radius:18px;
+                    background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                    color:white; font-size:26px; font-weight:900; cursor:pointer;
+                    box-shadow:0 10px 28px rgba(139,94,60,0.28); margin-bottom:16px;
+                ">Confirm Code</button>
+            </div>
+
+            <div id="afNewCredentialsSection" style="display:none;">
+                <!-- Divider -->
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <div style="flex:1;height:1px;background:#D2B48C;"></div>
+                    <span style="color:#8B5E3C;font-size:18px;font-weight:700;">New Credentials</span>
+                    <div style="flex:1;height:1px;background:#D2B48C;"></div>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <input id="afNewUsername" type="text" maxlength="20"
+                        placeholder="New Username (leave blank to keep same)" class="input-field" style="
+                    width:100%; height:72px; padding:18px 22px;
+                    border-radius:18px; font-size:24px; font-weight:700;
+                ">
+                    <p id="afNewUsernameErr"
+                        style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;"></p>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <input id="afNewPass" type="password" maxlength="20" placeholder="New Password" class="input-field"
+                        style="
+                    width:100%; height:72px; padding:18px 22px;
+                    border-radius:18px; font-size:26px; font-weight:700;
+                ">
+                    <p id="afNewPassErr"
+                        style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;">
+                    </p>
+                </div>
+                <div style="margin-bottom:24px;">
+                    <input id="afConfirmPass" type="password" maxlength="20" placeholder="Confirm New Password"
+                        class="input-field" style="
+                    width:100%; height:72px; padding:18px 22px;
+                    border-radius:18px; font-size:26px; font-weight:700;
+                ">
+                    <p id="afConfirmPassErr"
+                        style="color:#DC2626;font-size:18px;font-weight:700;margin-top:6px;display:none;"></p>
+                </div>
+                <p id="afGeneralErr"
+                    style="color:#DC2626;font-size:20px;font-weight:700;margin-bottom:14px;display:none;text-align:center;">
+                </p>
+                <button onclick="afResetPassword()" style="
+                width:100%; height:72px; border:none; border-radius:18px;
+                background:linear-gradient(135deg,#8B5E3C,#C08A5B);
+                color:white; font-size:26px; font-weight:900; cursor:pointer;
+                box-shadow:0 10px 28px rgba(139,94,60,0.28);
+            ">Reset Admin Credentials</button>
+            </div>
+
+            <!-- Success message -->
+            <p id="afSuccess"
+                style="color:#15803d;font-size:20px;font-weight:700;margin-top:16px;display:none;text-align:center;">
+                ✅ Admin credentials updated successfully!
+            </p>
+
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
