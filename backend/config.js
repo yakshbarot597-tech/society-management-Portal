@@ -43,9 +43,18 @@ module.exports = {
         password: process.env.DB_PASSWORD || "Yaksh@1419",
         database: process.env.DB_NAME || "society_management",
         connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 10,
-        ssl: process.env.DB_SSL === "true" ? {
-            ca: fs.readFileSync(path.join(__dirname, "ca.pem"))
-        } : null
+        ssl: (function() {
+            const host = process.env.DB_HOST || "localhost";
+            const isLocal = host === "localhost" || host === "127.0.0.1";
+            if (process.env.DB_SSL === "true" || !isLocal) {
+                try {
+                    return { ca: fs.readFileSync(path.join(__dirname, "ca.pem")) };
+                } catch (e) {
+                    return { ca: fs.readFileSync("./ca.pem") };
+                }
+            }
+            return null;
+        })()
     },
     twilio: {
         accountSid: process.env.TWILIO_ACCOUNT_SID || "",
