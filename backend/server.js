@@ -97,6 +97,7 @@ const isPeriodBefore = (target, current) => {
 };
 
 const app = express();
+app.set("trust proxy", 1);
 
 // Secure Express headers (Helmet)
 app.use(helmet({
